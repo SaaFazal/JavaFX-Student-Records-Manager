@@ -1,10 +1,7 @@
 package com.mycompany.javafxapplication1;
 
-import java.io.IOException; 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Optional;
 import javafx.fxml.FXML;
+import java.util.Optional;
 import javafx.scene.control.Button;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -33,15 +30,6 @@ public class PrimaryController {
     @FXML
     private PasswordField passPasswordField;
     
-    @FXML
-    private TextArea terminalTextArea; // Text Area to display the results for the command
-
-    @FXML
-    private Button runCommandButton; // New Button is added for command
-
-    @FXML
-    private TextField commandInputField; // Text Field to enter the command
-
     @FXML
     private void registerBtnHandler(ActionEvent event) {
         Stage secondaryStage = new Stage();
@@ -86,7 +74,7 @@ public class PrimaryController {
                 primaryStage.hide();
                 
                 // Show terminal window
-                showTerminalWindow(primaryStage);
+                showTerminalWindow();
             }
             else{
                 dialogue("Invalid User Name / Password","Please try again!");
@@ -97,63 +85,20 @@ public class PrimaryController {
         }
     }
 
-    private void showTerminalWindow(Stage primaryStage) {
-        // Create a new window with terminal interface
-        Stage terminalStage = new Stage();
-        terminalStage.setTitle("Terminal");
+    private void showTerminalWindow() {
+         try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("terminal.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 600, 400);
 
-        // Layout for terminal
-        VBox terminalVBox = new VBox(10);
-        terminalVBox.setAlignment(Pos.CENTER);
-
-        terminalTextArea = new TextArea();
-        terminalTextArea.setEditable(false);
-        terminalTextArea.setPrefHeight(200);
-
-        commandInputField = new TextField();
-        commandInputField.setPromptText("Enter command...");
-
-        runCommandButton = new Button("Run Command");
-        runCommandButton.setOnAction(e -> executeCommand());
-
-        terminalVBox.getChildren().addAll(terminalTextArea, commandInputField, runCommandButton);
-
-        Scene terminalScene = new Scene(terminalVBox, 600, 400);
-        terminalStage.setScene(terminalScene);
-        terminalStage.show();
-    }
-  @FXML
-    private void executeCommand() {
-        String command = commandInputField.getText();
-        if (command.isEmpty()) {
-            showError("Empty Command", "Please enter a command to execute.");
-            return;
+            // Open the terminal window
+            Stage terminalStage = new Stage();
+            terminalStage.setTitle("Terminal");
+            terminalStage.setScene(scene);
+            terminalStage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        
-try {
-            // Run the terminal command
-            ProcessBuilder processBuilder = new ProcessBuilder();
-            processBuilder.command("bash", "-c", command);
-            
-            Process process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line;
-            StringBuilder output = new StringBuilder();
-            
-            while ((line = reader.readLine()) != null) {
-                output.append(line).append("\n");
-            }
-            terminalTextArea.setText(output.toString());
-        } catch (IOException e) {
-            showError("Command Execution Failed", "There was an error executing the command.");
-        }
-    }
-
-    private void showError(String title, String message) {
-        Alert alert = new Alert(AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 }
