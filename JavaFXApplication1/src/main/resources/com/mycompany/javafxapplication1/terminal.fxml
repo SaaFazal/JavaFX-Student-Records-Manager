@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.Button?>
-<?import javafx.geometry.Pos?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<VBox fx:controller="com.mycompany.javafxapplication1.TerminalController" xmlns:fx="http://javafx.com/fxml/1" spacing="10.0" alignment="CENTER">
-    <TextArea fx:id="terminalTextArea" prefHeight="200.0" prefWidth="400.0" editable="false"/>
-    <TextField fx:id="commandInputField" promptText="Enter command..." prefWidth="400.0"/>
-    <Button fx:id="runCommandButton" text="Run Command" onAction="#executeCommand"/>
-</VBox>
+<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.TerminalController">
+   <children>
+      <TextField fx:id="commandInput" layoutX="215.0" layoutY="79.0" promptText="Command input " />
+      <Label layoutX="261.0" layoutY="52.0" text="Terminal" />
+      <TextArea fx:id="commandDisplay" layoutX="86.0" layoutY="147.0" prefHeight="236.0" prefWidth="416.0" />
+      <Button fx:id="enterBtn" layoutX="324.0" layoutY="112.0" text="Enter" onAction="#executeCommand" />
+      <Button fx:id="backButton" layoutX="23.0" layoutY="14.0" text="←" onAction="#backButtonHandler" />
+   </children>
+</AnchorPane>

@@ -39,7 +39,7 @@ public class PrimaryController {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("register.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 640, 480);
+            Scene scene = new Scene(root, 800, 600);
             secondaryStage.setScene(scene);
             secondaryStage.setTitle("Register a new User");
             secondaryStage.show();
@@ -50,16 +50,11 @@ public class PrimaryController {
     }
     
     private void dialogue(String headerMsg, String contentMsg) {
-        Stage secondaryStage = new Stage();
-        Group root = new Group();
-        Scene scene = new Scene(root, 300, 300, Color.DARKGRAY);
-
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText(headerMsg);
         alert.setContentText(contentMsg);
-
-        Optional<ButtonType> result = alert.showAndWait();
+        alert.showAndWait();
     }
 
     @FXML
@@ -68,31 +63,27 @@ public class PrimaryController {
         Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
         try {
             DB myObj = new DB();
-            String[] credentials = {userTextField.getText(), passPasswordField.getText()};
             if(myObj.validateUser(userTextField.getText(), passPasswordField.getText())){
-                // Hide login screen
                 primaryStage.hide();
-                
-                // Show terminal window
                 showTerminalWindow();
             }
             else{
                 dialogue("Invalid User Name / Password","Please try again!");
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void showTerminalWindow() {
-         try {
+        try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("terminal.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 600, 400);
-
-            // Open the terminal window
+            Scene scene = new Scene(root, 800, 600);
+            
+            root.setStyle("-fx-background-color: #2c3e50;");
+            
             Stage terminalStage = new Stage();
             terminalStage.setTitle("Terminal");
             terminalStage.setScene(scene);
