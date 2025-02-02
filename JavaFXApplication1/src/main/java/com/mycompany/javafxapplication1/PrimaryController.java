@@ -39,7 +39,7 @@ public class PrimaryController {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("register.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 800, 600);
+            Scene scene = new Scene(root, 1000, 700);  // Increased size
             secondaryStage.setScene(scene);
             secondaryStage.setTitle("Register a new User");
             secondaryStage.show();
@@ -80,7 +80,7 @@ public class PrimaryController {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("terminal.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 800, 600);
+            Scene scene = new Scene(root, 1000, 700);  // Increased size
             
             root.setStyle("-fx-background-color: #2c3e50;");
             

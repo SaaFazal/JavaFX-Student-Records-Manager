@@ -7,12 +7,12 @@ package com.mycompany.javafxapplication1;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -21,33 +21,19 @@ import javafx.stage.Stage;
 public class TerminalController {
 
     @FXML
-    private TextArea commandDisplay;  // Matches FXML
-    @FXML
-    private Button enterBtn;  // Matches FXML
-    @FXML
-    private TextField commandInput;  // Matches FXML
-    
-    @FXML
-private void backButtonHandler(ActionEvent event) {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("primary.fxml")); // Load Primary Scene
-        Parent root = loader.load();
-        
-        // Get the current stage
-        Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        
-            Scene scene = new Scene(root, 640, 480); // Set scene size
-        stage.setScene(scene);
-        stage.setTitle("Primary View");
-        stage.show();
-    } catch (IOException e) {
-        e.printStackTrace();
-    }
-}
-
+    private TextArea commandDisplay;
 
     @FXML
-    private void executeCommand() {
+    private Button enterBtn;
+
+    @FXML
+    private TextField commandInput;
+
+    @FXML
+    private Button backButton; // Added back button
+
+    @FXML
+    private void onEnterButtonClicked() {
         String command = commandInput.getText();
         if (command.isEmpty()) {
             showError("Empty Command", "Please enter a command to execute.");
@@ -55,14 +41,7 @@ private void backButtonHandler(ActionEvent event) {
         }
 
         try {
-            ProcessBuilder processBuilder;
-            if (System.getProperty("os.name").toLowerCase().contains("win")) {
-                processBuilder = new ProcessBuilder("cmd.exe", "/c", command);
-            } else {
-                processBuilder = new ProcessBuilder("bash", "-c", command);
-            }
-            processBuilder.redirectErrorStream(true);
-
+            ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
             Process process = processBuilder.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             StringBuilder output = new StringBuilder();
@@ -71,15 +50,36 @@ private void backButtonHandler(ActionEvent event) {
             while ((line = reader.readLine()) != null) {
                 output.append(line).append("\n");
             }
-
             commandDisplay.setText(output.toString());
         } catch (IOException e) {
-            showError("Command Execution Failed", "Error executing command: " + e.getMessage());
+            showError("Command Execution Failed", "There was an error executing the command.");
         }
     }
 
+    @FXML
+private void backButtonHandler() {
+    try {
+        // Load the primary view
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("primary.fxml"));
+        Parent root = loader.load();
+
+        // Get the current stage (Terminal window)
+        Stage stage = (Stage) backButton.getScene().getWindow();
+        
+        // Set the scene to the existing stage instead of creating a new window
+        Scene scene = new Scene(root, 1000, 700);  // Increased size
+        stage.setScene(scene);
+        stage.setTitle("User Login"); // Set the title back to primary
+        stage.show();
+        
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
+
+
     private void showError(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
+        Alert alert = new Alert(AlertType.ERROR);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(message);

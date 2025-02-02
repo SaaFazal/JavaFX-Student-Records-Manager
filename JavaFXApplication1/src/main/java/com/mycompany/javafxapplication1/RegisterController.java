@@ -24,16 +24,8 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-/**
- * FXML Controller class
- *
- * @author ntu-user
- */
 public class RegisterController {
 
-    /**
-     * Initializes the controller class.
-     */
     @FXML
     private Button registerBtn;
 
@@ -54,7 +46,8 @@ public class RegisterController {
     
     @FXML
     private Button selectBtn;
-    
+
+    // Handle Select File Button Click
     @FXML
     private void selectBtnHandler(ActionEvent event) throws IOException {
         Stage primaryStage = (Stage) selectBtn.getScene().getWindow();
@@ -64,74 +57,74 @@ public class RegisterController {
         fileChooser.setTitle("Open Resource File");
         File selectedFile = fileChooser.showOpenDialog(primaryStage);
         
-        if(selectedFile!=null){
-            fileText.setText((String)selectedFile.getCanonicalPath());
+        if (selectedFile != null) {
+            fileText.setText(selectedFile.getCanonicalPath());
         }
-        
     }
 
-    private void dialogue(String headerMsg, String contentMsg) {
-        Stage secondaryStage = new Stage();
-        Group root = new Group();
-        Scene scene = new Scene(root, 300, 300, Color.DARKGRAY);
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    // Method to show confirmation or error dialog
+    private void showDialog(String headerMsg, String contentMsg, Alert.AlertType type) {
+        Alert alert = new Alert(type);
         alert.setTitle("Confirmation Dialog");
         alert.setHeaderText(headerMsg);
         alert.setContentText(contentMsg);
-        Optional<ButtonType> result = alert.showAndWait();
+        alert.showAndWait();
     }
 
+    // Handle Register Button Click
     @FXML
     private void registerBtnHandler(ActionEvent event) {
         Stage secondaryStage = new Stage();
         Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
+        
         try {
             FXMLLoader loader = new FXMLLoader();
             DB myObj = new DB();
+            
             if (passPasswordField.getText().equals(rePassPasswordField.getText())) {
+                // Register user to the database
                 myObj.addDataToDB(userTextField.getText(), passPasswordField.getText());
-                dialogue("Adding information to the database", "Successful!");
+                showDialog("Registration Successful", "User registered successfully!", Alert.AlertType.INFORMATION);
+                
+                // Load secondary view after successful registration
                 String[] credentials = {userTextField.getText(), passPasswordField.getText()};
                 loader.setLocation(getClass().getResource("secondary.fxml"));
                 Parent root = loader.load();
-                Scene scene = new Scene(root, 640, 480);
+                Scene scene = new Scene(root, 1000, 700);  
                 secondaryStage.setScene(scene);
                 SecondaryController controller = loader.getController();
-                secondaryStage.setTitle("Show users");
                 controller.initialise(credentials);
-                String msg = "some data sent from Register Controller";
-                secondaryStage.setUserData(msg);
+                secondaryStage.setTitle("Show Users");
+                secondaryStage.show();
+                primaryStage.close();
             } else {
-                loader.setLocation(getClass().getResource("register.fxml"));
-                Parent root = loader.load();
-                Scene scene = new Scene(root, 640, 480);
-                secondaryStage.setScene(scene);
-                secondaryStage.setTitle("Register a new User");
+                // Passwords don't match, show error message
+                showDialog("Registration Failed", "Passwords do not match, please try again.", Alert.AlertType.ERROR);
             }
-            secondaryStage.show();
-            primaryStage.close();
-
         } catch (Exception e) {
             e.printStackTrace();
+            showDialog("Error", "An error occurred during registration. Please try again.", Alert.AlertType.ERROR);
         }
     }
 
+    // Handle Back to Login Button Click
     @FXML
     private void backLoginBtnHandler(ActionEvent event) {
-        Stage secondaryStage = new Stage();
         Stage primaryStage = (Stage) backLoginBtn.getScene().getWindow();
+        
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("primary.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 640, 480);
+            Scene scene = new Scene(root, 1000, 700);  
+            Stage secondaryStage = new Stage();
             secondaryStage.setScene(scene);
             secondaryStage.setTitle("Login");
             secondaryStage.show();
-            primaryStage.close();
-
+            primaryStage.close(); // Close current Register stage
         } catch (Exception e) {
             e.printStackTrace();
+            showDialog("Error", "An error occurred while loading the login page.", Alert.AlertType.ERROR);
         }
     }
 }

@@ -1,10 +1,5 @@
 package com.mycompany.javafxapplication1;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,38 +15,37 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SecondaryController {
-    
+
     @FXML
     private TextField userTextField;
-    
+
     @FXML
-    private TableView dataTableView;
+    private TableView<User> dataTableView;
 
     @FXML
     private Button secondaryButton;
-    
+
     @FXML
     private Button refreshBtn;
-    
+
     @FXML
     private TextField customTextField;
-    
+
     @FXML
-    private void RefreshBtnHandler(ActionEvent event){
+    private void RefreshBtnHandler(ActionEvent event) {
         Stage primaryStage = (Stage) customTextField.getScene().getWindow();
-        customTextField.setText((String)primaryStage.getUserData());
+        customTextField.setText((String) primaryStage.getUserData());
     }
-        
+
     @FXML
-    private void switchToPrimary(){
+    private void switchToPrimary() {
         Stage secondaryStage = new Stage();
         Stage primaryStage = (Stage) secondaryButton.getScene().getWindow();
         try {
-            
-        
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("primary.fxml"));
             Parent root = loader.load();
@@ -60,7 +54,6 @@ public class SecondaryController {
             secondaryStage.setTitle("Login");
             secondaryStage.show();
             primaryStage.close();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,19 +61,25 @@ public class SecondaryController {
 
     public void initialise(String[] credentials) {
         userTextField.setText(credentials[0]);
-        DB myObj = new DB();
-        ObservableList<User> data;
-        try {
-            data = myObj.getDataFromTable();
-            TableColumn user = new TableColumn("User");
-        user.setCellValueFactory(
-        new PropertyValueFactory<>("user"));
 
-        TableColumn pass = new TableColumn("Pass");
-        pass.setCellValueFactory(
-            new PropertyValueFactory<>("pass"));
-        dataTableView.setItems(data);
-        dataTableView.getColumns().addAll(user, pass);
+        DB myObj = new DB();
+        try {
+            // Retrieve data from the database
+            ObservableList<User> data = myObj.getDataFromTable();
+
+            // Set up columns
+            TableColumn<User, String> userColumn = new TableColumn<>("User");
+            userColumn.setCellValueFactory(new PropertyValueFactory<>("user"));
+
+            TableColumn<User, String> passColumn = new TableColumn<>("Pass");
+            passColumn.setCellValueFactory(new PropertyValueFactory<>("pass"));
+
+            // Add columns to TableView
+            dataTableView.getColumns().addAll(userColumn, passColumn);
+
+            // Bind data to TableView
+            dataTableView.setItems(data);
+
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SecondaryController.class.getName()).log(Level.SEVERE, null, ex);
         }

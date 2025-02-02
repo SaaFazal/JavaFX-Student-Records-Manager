@@ -3,12 +3,25 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.TerminalController">
+<AnchorPane prefWidth="1000.0" prefHeight="700.0" style="-fx-background-color: #2c3e50;"
+            xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.TerminalController">
    <children>
-      <TextField fx:id="commandInput" layoutX="215.0" layoutY="79.0" promptText="Command input " />
-      <Label layoutX="261.0" layoutY="52.0" text="Terminal" />
-      <TextArea fx:id="commandDisplay" layoutX="86.0" layoutY="147.0" prefHeight="236.0" prefWidth="416.0" />
-      <Button fx:id="enterBtn" layoutX="324.0" layoutY="112.0" text="Enter" onAction="#executeCommand" />
-      <Button fx:id="backButton" layoutX="23.0" layoutY="14.0" text="←" onAction="#backButtonHandler" />
+      <!-- Terminal Output (Smaller TextArea) -->
+      <TextArea fx:id="commandDisplay" editable="false" layoutX="50.0" layoutY="50.0"
+        style="-fx-font-size: 14px; -fx-pref-height: 250px; -fx-pref-width: 800px; -fx-background-color: #ecf0f1; -fx-padding: 10px;" />
+
+      <!-- Command Input (Bigger TextField) -->
+      <TextField fx:id="commandInput" promptText="Enter command here..." layoutX="50.0" layoutY="320.0"
+        style="-fx-font-size: 18px; -fx-pref-height: 50px; -fx-pref-width: 650px; -fx-background-color: #ffffff; -fx-padding: 10px;" />
+      
+      <!-- Bigger Enter Button -->
+      <Button fx:id="enterBtn" layoutX="720.0" layoutY="320.0" text="Enter" 
+              style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-padding: 10px; -fx-pref-width: 130px; -fx-pref-height: 50px;"
+              onAction="#onEnterButtonClicked"/>
+      
+      <!-- Back Button -->
+      <Button fx:id="backButton" layoutX="20.0" layoutY="20.0" text="←" 
+              style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 5px; -fx-pref-width: 50px; -fx-pref-height: 40px;"
+              onAction="#backButtonHandler"/>
    </children>
 </AnchorPane>
