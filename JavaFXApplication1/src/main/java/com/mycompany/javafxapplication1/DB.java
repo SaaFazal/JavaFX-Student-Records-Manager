@@ -2,6 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
  */
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
+ */
 package com.mycompany.javafxapplication1;
 
 import java.io.File;
@@ -35,7 +39,8 @@ import javax.crypto.spec.PBEKeySpec;
  * @author ntu-user
  */
 public class DB {
-    private String fileName = "jdbc:sqlite:comp20081.db";
+    private static final String fileName = "jdbc:sqlite:comp20081.db";
+
     private int timeout = 30;
     private String dataBaseName = "COMP20081";
     private String dataBaseTableName = "Users";
@@ -47,7 +52,7 @@ public class DB {
     private String saltValue;
     
     /**
-     * @brief constructor - generates the salt if it doesn't exists or load it from the file .salt
+     * @brief constructor - generates the salt if it doesn't exist or loads it from the file .salt
      */
     DB() {
         try {
@@ -79,7 +84,7 @@ public class DB {
             connection = DriverManager.getConnection(fileName);
             var statement = connection.createStatement();
             statement.setQueryTimeout(timeout);
-            statement.executeUpdate("create table if not exists " + tableName + "(id integer primary key autoincrement, name string, password string)");
+            statement.executeUpdate("create table if not exists " + tableName + "(id integer primary key autoincrement, name string, password string, role string)");
 
         } catch (SQLException ex) {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
@@ -89,7 +94,6 @@ public class DB {
                     connection.close();
                 }
             } catch (SQLException e) {
-                // connection close failed.
                 System.err.println(e.getMessage());
             }
         }
@@ -115,7 +119,6 @@ public class DB {
                     connection.close();
                 }
             } catch (SQLException e) {
-                // connection close failed.
                 System.err.println(e.getMessage());
             }
         }
@@ -125,15 +128,16 @@ public class DB {
      * @brief add data to the database method
      * @param user name of type String
      * @param password of type String
+     * @param role of type String
      */
-        public void addDataToDB(String user, String password) throws InvalidKeySpecException, ClassNotFoundException {
+    public void addDataToDB(String user, String password, String role) throws InvalidKeySpecException, ClassNotFoundException {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(fileName);
             var statement = connection.createStatement();
             statement.setQueryTimeout(timeout);
-//            System.out.println("Adding User: " + user + ", Password: " + password);
-            statement.executeUpdate("insert into " + dataBaseTableName + " (name, password) values('" + user + "','" + generateSecurePassword(password) + "')");
+            statement.executeUpdate("insert into " + dataBaseTableName + " (name, password, role) values('" 
+                                + user + "','" + generateSecurePassword(password) + "','" + role + "')");
         } catch (SQLException ex) {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
@@ -143,50 +147,42 @@ public class DB {
                 }
             } catch (SQLException ex) {
                 Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                try {
-                    if (connection != null) {
-                        connection.close();
-                    }
-                } catch (SQLException e) {
-                    // connection close failed.
-                    System.err.println(e.getMessage());
-                }
             }
         }
     }
 
     /**
      * @brief get data from the Database method
-     * @retunr results as ResultSet
+     * @return results as ObservableList<User>
      */
     public ObservableList<User> getDataFromTable() throws ClassNotFoundException {
-        ObservableList<User> result = FXCollections.observableArrayList();
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(fileName);
-            var statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet rs = statement.executeQuery("select * from " + this.dataBaseTableName);
-            while (rs.next()) {
-                // read the result set
-                result.add(new User(rs.getString("name"),rs.getString("password")));
-            }
-            
-        } catch (SQLException ex) {
-            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                // connection close failed.
-                System.err.println(e.getMessage());
-            }
+    ObservableList<User> result = FXCollections.observableArrayList();
+    try {
+        Class.forName("org.sqlite.JDBC");
+        connection = DriverManager.getConnection(fileName);
+        var statement = connection.createStatement();
+        statement.setQueryTimeout(timeout);
+        ResultSet rs = statement.executeQuery("select * from " + this.dataBaseTableName);
+        while (rs.next()) {
+            // Use the constructor that takes user, pass, and role, as you defined in your User class
+            result.add(new User(rs.getString("name"), rs.getString("password"), rs.getString("role")));
         }
-        return result;
+
+    } catch (SQLException ex) {
+        Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+    } finally {
+        try {
+            if (connection != null) {
+                connection.close();
+            }
+        } catch (SQLException e) {
+            // connection close failed.
+            System.err.println(e.getMessage());
+        }
     }
+    return result;
+}
+
 
     /**
      * @brief decode password method
@@ -203,7 +199,7 @@ public class DB {
             statement.setQueryTimeout(timeout);
             ResultSet rs = statement.executeQuery("select name, password from " + this.dataBaseTableName);
             String inPass = generateSecurePassword(pass);
-            // Let's iterate through the java ResultSet
+            // Iterate through the java ResultSet
             while (rs.next()) {
                 if (user.equals(rs.getString("name")) && rs.getString("password").equals(inPass)) {
                     flag = true;
@@ -218,12 +214,42 @@ public class DB {
                     connection.close();
                 }
             } catch (SQLException e) {
-                // connection close failed.
                 System.err.println(e.getMessage());
             }
         }
 
         return flag;
+    }
+
+    /**
+     * @brief get the role of a user from the database
+     * @param username name of the user
+     * @return role of the user as String
+     */
+    public String getUserRole(String username) throws ClassNotFoundException {
+        String role = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(fileName);
+            var statement = connection.createStatement();
+            statement.setQueryTimeout(timeout);
+            ResultSet rs = statement.executeQuery("SELECT role FROM " + this.dataBaseTableName + " WHERE name = '" + username + "'");
+            
+            if (rs.next()) {
+                role = rs.getString("role");
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        return role;  // Returns the role (e.g., 'admin', 'user', etc.)
     }
 
     private String getSaltvalue(int length) {
@@ -236,7 +262,6 @@ public class DB {
         return new String(finalval);
     }
 
-    /* Method to generate the hash value */
     private byte[] hash(char[] password, byte[] salt) throws InvalidKeySpecException {
         PBEKeySpec spec = new PBEKeySpec(password, salt, iterations, keylength);
         Arrays.fill(password, Character.MIN_VALUE);
@@ -260,22 +285,51 @@ public class DB {
         return finalval;
     }
 
-    /**
-     * @brief get table name
-     * @return table name as String
-     */
     public String getTableName() {
         return this.dataBaseTableName;
     }
 
-    /**
-     * @brief print a message on screen method
-     * @param message of type String
-     */
     public void log(String message) {
         System.out.println(message);
-
     }
+    public static Connection getConnection() throws ClassNotFoundException, SQLException {
+    Class.forName("org.sqlite.JDBC");
+    return DriverManager.getConnection(fileName);
+}
+
+
+
+
+
+//    public static void main(String[] args) throws InvalidKeySpecException {
+//        DB myObj = new DB();
+//        myObj.log("-------- Simple Tutorial on how to make JDBC connection to SQLite DB ------------");
+//        myObj.log("\n---------- Drop table ----------");
+//        myObj.delTable(myObj.getTableName());
+//        myObj.log("\n---------- Create table ----------");
+//        myObj.createTable(myObj.getTableName());
+//        myObj.log("\n---------- Adding Users ----------");
+//        myObj.addDataToDB("ntu-user", "12z34");
+//        myObj.addDataToDB("ntu-user2", "12yx4");
+//        myObj.addDataToDB("ntu-user3", "a1234");
+//        myObj.log("\n---------- get Data from the Table ----------");
+//        myObj.getDataFromTable(myObj.getTableName());
+//        myObj.log("\n---------- Validate users ----------");
+//        String[] users = new String[]{"ntu-user", "ntu-user", "ntu-user1"};
+//        String[] passwords = new String[]{"12z34", "1235", "1234"};
+//        String[] messages = new String[]{"VALID user and password",
+//            "VALID user and INVALID password", "INVALID user and VALID password"};
+//
+//        for (int i = 0; i < 3; i++) {
+//            System.out.println("Testing " + messages[i]);
+//            if (myObj.validateUser(users[i], passwords[i], myObj.getTableName())) {
+//                myObj.log("++++++++++VALID credentials!++++++++++++");
+//            } else {
+//                myObj.log("----------INVALID credentials!----------");
+//            }
+//        }
+//    }
+
 
 //    public static void main(String[] args) throws InvalidKeySpecException {
 //        DB myObj = new DB();
