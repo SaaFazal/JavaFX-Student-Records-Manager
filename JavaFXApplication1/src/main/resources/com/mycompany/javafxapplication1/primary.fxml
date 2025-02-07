@@ -4,36 +4,47 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.*?>
 
-<VBox alignment="CENTER" spacing="20.0" prefWidth="1000.0" prefHeight="700.0" style="-fx-background-color: #34495e;"
+<VBox alignment="CENTER" spacing="20.0" prefWidth="1000.0" prefHeight="700.0" 
+      style="-fx-background-color: #34495e;"
+      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.javafxapplication1.PrimaryController">
+    
+    <children>
+        <Label text="User Login" style="-fx-font-size: 20px; -fx-text-fill: white;"/>
 
-      xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.PrimaryController">
-   <children>
-      <Label text="User Login" style="-fx-font-size: 20px; -fx-text-fill: white;"/>
-      <GridPane alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-          <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <Label text="User" style="-fx-text-fill: white;"/>
-            <TextField fx:id="userTextField" GridPane.columnIndex="1" style="-fx-background-color: #ecf0f1;" />
-            <Label text="Password" GridPane.rowIndex="1" style="-fx-text-fill: white;" />
-            <PasswordField fx:id="passPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1" style="-fx-background-color: #ecf0f1;" />
-            <Button fx:id="registerBtn" text="Register" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                    style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 5px;" 
-                    onAction="#registerBtnHandler"/>
-            <Button fx:id="primaryButton" text="Login" GridPane.rowIndex="2" 
-                    style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; -fx-border-radius: 5px; -fx-padding: 5px;" 
-                    onAction="#switchToSecondary"/>
-         </children>
-      </GridPane>
-   </children>
-   <padding>
-      <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-   </padding>
+        <GridPane alignment="CENTER">
+            <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+            </rowConstraints>
+
+            <children>
+                <Label text="User" style="-fx-text-fill: white;"/>
+                <TextField fx:id="userTextField" GridPane.columnIndex="1" style="-fx-background-color: #ecf0f1;" />
+
+                <Label text="Password" GridPane.rowIndex="1" style="-fx-text-fill: white;" />
+                <PasswordField fx:id="passPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1" 
+                              style="-fx-background-color: #ecf0f1;" />
+
+                <Button fx:id="registerBtn" text="Register" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; 
+                               -fx-border-radius: 5px; -fx-padding: 5px;" 
+                        onAction="#registerBtnHandler"/>
+
+                <Button fx:id="primaryButton" text="Login" GridPane.rowIndex="2" 
+                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; 
+                               -fx-border-radius: 5px; -fx-padding: 5px;" 
+                        onAction="#switchToSecondary"/>
+            </children>
+        </GridPane>
+    </children>
+
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
 </VBox>

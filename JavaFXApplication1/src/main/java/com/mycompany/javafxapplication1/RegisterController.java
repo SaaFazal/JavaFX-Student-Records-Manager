@@ -16,6 +16,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
@@ -42,10 +43,16 @@ public class RegisterController {
     private TextField userTextField;
     
     @FXML
+    private PasswordField adminPasscodeField;
+    
+    @FXML
     private Text fileText;
     
     @FXML
     private Button selectBtn;
+
+    @FXML
+    private ComboBox<String> roleComboBox;  // Role ComboBox
 
     // Handle Select File Button Click
     @FXML
@@ -73,39 +80,48 @@ public class RegisterController {
 
     // Handle Register Button Click
     @FXML
-    private void registerBtnHandler(ActionEvent event) {
-        Stage secondaryStage = new Stage();
-        Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
-        
-        try {
-            FXMLLoader loader = new FXMLLoader();
-            DB myObj = new DB();
-            
-            if (passPasswordField.getText().equals(rePassPasswordField.getText())) {
-                // Register user to the database
-                myObj.addDataToDB(userTextField.getText(), passPasswordField.getText());
-                showDialog("Registration Successful", "User registered successfully!", Alert.AlertType.INFORMATION);
-                
-                // Load secondary view after successful registration
-                String[] credentials = {userTextField.getText(), passPasswordField.getText()};
-                loader.setLocation(getClass().getResource("secondary.fxml"));
-                Parent root = loader.load();
-                Scene scene = new Scene(root, 1000, 700);  
-                secondaryStage.setScene(scene);
-                SecondaryController controller = loader.getController();
-                controller.initialise(credentials);
-                secondaryStage.setTitle("Show Users");
-                secondaryStage.show();
-                primaryStage.close();
-            } else {
-                // Passwords don't match, show error message
-                showDialog("Registration Failed", "Passwords do not match, please try again.", Alert.AlertType.ERROR);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            showDialog("Error", "An error occurred during registration. Please try again.", Alert.AlertType.ERROR);
+private void registerBtnHandler(ActionEvent event) {
+    Stage secondaryStage = new Stage();
+    Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
+
+    try {
+        FXMLLoader loader = new FXMLLoader();
+        DB myObj = new DB();
+
+        // Get the selected role based on the passcode
+        String selectedRole = "user"; // Default role is "user"
+        String adminPasscode = adminPasscodeField.getText(); // Get the entered passcode
+
+        // Check if the passcode is correct (e.g., "admin123")
+        if ("admin123".equals(adminPasscode)) {
+            selectedRole = "admin"; // Assign "admin" role if passcode is correct
         }
+
+        if (passPasswordField.getText().equals(rePassPasswordField.getText())) {
+            // Register user to the database, including the role
+            myObj.addDataToDB(userTextField.getText(), passPasswordField.getText(), selectedRole);
+            showDialog("Registration Successful", "User registered successfully!", Alert.AlertType.INFORMATION);
+
+            // Load secondary view after successful registration
+            String[] credentials = {userTextField.getText(), passPasswordField.getText()};
+            loader.setLocation(getClass().getResource("secondary.fxml"));
+            Parent root = loader.load();
+            Scene scene = new Scene(root, 1000, 700);
+            secondaryStage.setScene(scene);
+            SecondaryController controller = loader.getController();
+            controller.initialise(credentials);
+            secondaryStage.setTitle("Show Users");
+            secondaryStage.show();
+            primaryStage.close();
+        } else {
+            // Passwords don't match, show error message
+            showDialog("Registration Failed", "Passwords do not match, please try again.", Alert.AlertType.ERROR);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        showDialog("Error", "An error occurred during registration. Please try again.", Alert.AlertType.ERROR);
     }
+}
 
     // Handle Back to Login Button Click
     @FXML

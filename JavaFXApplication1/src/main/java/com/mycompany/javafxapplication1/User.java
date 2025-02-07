@@ -13,11 +13,17 @@ import javafx.beans.property.SimpleStringProperty;
 public class User {
     private SimpleStringProperty user;
     private SimpleStringProperty pass;
+    private SimpleStringProperty role; // Admin or Regular User
 
-    User(String user, String pass) {
-        this.user = new SimpleStringProperty(user);
-        this.pass = new SimpleStringProperty(pass);
-    }
+    // Static field to hold the currently logged-in user
+    public static User currentUser = null;
+
+    public User(String user, String pass, String role) {
+    this.user = new SimpleStringProperty(user);
+    this.pass = new SimpleStringProperty(pass);
+    this.role = new SimpleStringProperty(role);
+}
+
 
     public String getUser() {
         return user.get();
@@ -33,5 +39,28 @@ public class User {
 
     public void setPass(String pass) {
         this.pass.set(pass);
+    }
+
+    public String getRole() {
+        return role.get();
+    }
+
+    public void setRole(String role) {
+        this.role.set(role);
+    }
+
+    // Check if the user is an admin
+    public boolean isAdmin() {
+        return "admin".equalsIgnoreCase(role.get());
+    }
+
+    // Method to log in a user
+    public static void loginUser(User user) {
+        currentUser = user; // Set the current user to the passed user
+    }
+
+    // Method to log out the user
+    public static void logoutUser() {
+        currentUser = null; // Reset the current user when logged out
     }
 }

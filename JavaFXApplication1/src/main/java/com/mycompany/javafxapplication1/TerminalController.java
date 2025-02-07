@@ -59,23 +59,39 @@ public class TerminalController {
     @FXML
 private void backButtonHandler() {
     try {
-        // Load the primary view
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("primary.fxml"));
+        // Check if the user is logged in
+        if (User.currentUser == null) {
+            showError("Error", "User is not logged in or session expired.");
+            return;
+        }
+
+        // Load the Main Dashboard FXML
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
         Parent root = loader.load();
 
-        // Get the current stage (Terminal window)
-        Stage stage = (Stage) backButton.getScene().getWindow();
-        
-        // Set the scene to the existing stage instead of creating a new window
-        Scene scene = new Scene(root, 1000, 700);  // Increased size
+        // Get the controller for MainDashboard
+        MainDashboardController dashboardController = loader.getController();
+        dashboardController.setUserRole(User.currentUser.getRole());  // Pass the role to the MainDashboard
+
+        // Close the terminal window
+        stage.close();
+
+        // Reuse the existing stage (MainDashboard)
+        Scene scene = new Scene(root, 1000, 700);
         stage.setScene(scene);
-        stage.setTitle("User Login"); // Set the title back to primary
+        stage.setTitle("Main Dashboard");
         stage.show();
-        
     } catch (IOException e) {
         e.printStackTrace();
     }
 }
+private Stage stage;
+
+public void setStage(Stage stage) {
+    this.stage = stage;
+}
+
+
 
 
     private void showError(String title, String message) {

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Pos?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.MainDashboardController"
+      alignment="CENTER" spacing="20.0" style="-fx-background-color: #2c3e50;">
+    <Button fx:id="userManagementBtn" text="User Management" onAction="#handleUserManagement" />
+    <Button fx:id="terminalBtn" text="Terminal" onAction="#handleTerminal" />
+    <Button fx:id="fileManagementBtn" text="File Management" onAction="#handleFileManagement" />
+</VBox>

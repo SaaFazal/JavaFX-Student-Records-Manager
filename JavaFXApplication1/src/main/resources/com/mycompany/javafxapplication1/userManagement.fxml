@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.mycompany.javafxapplication1.UserManagementController" spacing="10">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+
+    <TableView fx:id="userTable" prefWidth="400">
+        <columns>
+            <TableColumn text="Username" fx:id="usernameColumn" />
+            <TableColumn text="Role" fx:id="roleColumn" />
+            <TableColumn text="Password" fx:id="passwordColumn" />
+        </columns>
+    </TableView>
+<HBox spacing="10">
+    <Button text="Update" onAction="#handleUpdate" />
+    <Button text="Add" onAction="#handleAdd" />
+    <Button text="Delete" onAction="#handleDelete" />
+ </HBox>   
+    <Button text="Close" onAction="#closeWindow"/>
+    
+
+</VBox>
