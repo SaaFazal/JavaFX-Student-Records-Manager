@@ -7,6 +7,8 @@ package com.mycompany.javafxapplication1;
 import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -81,46 +83,52 @@ public class RegisterController {
     // Handle Register Button Click
     @FXML
 private void registerBtnHandler(ActionEvent event) {
-    Stage secondaryStage = new Stage();
-    Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
+    System.out.println("Register button clicked.");
 
-    try {
-        FXMLLoader loader = new FXMLLoader();
-        DB myObj = new DB();
+    Task<Void> task = new Task<Void>() {
+        @Override
+        protected Void call() throws Exception {
+            try {
+                System.out.println("Initializing database connection...");
+                DB myObj = new DB();
 
-        // Get the selected role based on the passcode
-        String selectedRole = "user"; // Default role is "user"
-        String adminPasscode = adminPasscodeField.getText(); // Get the entered passcode
+                String selectedRole = "user";
+                String adminPasscode = adminPasscodeField.getText();
 
-        // Check if the passcode is correct (e.g., "admin123")
-        if ("admin123".equals(adminPasscode)) {
-            selectedRole = "admin"; // Assign "admin" role if passcode is correct
+                System.out.println("Admin passcode entered: " + adminPasscode);
+
+                if ("admin123".equals(adminPasscode)) {
+                    selectedRole = "admin";
+                }
+
+                System.out.println("Selected role: " + selectedRole);
+
+                if (passPasswordField.getText().equals(rePassPasswordField.getText())) {
+                    System.out.println("Passwords match. Registering user...");
+                    myObj.addDataToDB(userTextField.getText(), passPasswordField.getText(), selectedRole);
+                    System.out.println("User registered successfully.");
+
+                    Platform.runLater(() -> {
+                        showDialog("Registration Successful", "User registered successfully!", Alert.AlertType.INFORMATION);
+                    });
+                } else {
+                    System.out.println("Passwords do not match.");
+                    Platform.runLater(() -> {
+                        showDialog("Registration Failed", "Passwords do not match, please try again.", Alert.AlertType.ERROR);
+                    });
+                }
+            } catch (Exception e) {
+                System.err.println("Error during registration: " + e.getMessage());
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    showDialog("Error", "An error occurred during registration. Please try again.", Alert.AlertType.ERROR);
+                });
+            }
+            return null;
         }
+    };
 
-        if (passPasswordField.getText().equals(rePassPasswordField.getText())) {
-            // Register user to the database, including the role
-            myObj.addDataToDB(userTextField.getText(), passPasswordField.getText(), selectedRole);
-            showDialog("Registration Successful", "User registered successfully!", Alert.AlertType.INFORMATION);
-
-            // Load secondary view after successful registration
-            String[] credentials = {userTextField.getText(), passPasswordField.getText()};
-            loader.setLocation(getClass().getResource("secondary.fxml"));
-            Parent root = loader.load();
-            Scene scene = new Scene(root, 1000, 700);
-            secondaryStage.setScene(scene);
-            SecondaryController controller = loader.getController();
-            controller.initialise(credentials);
-            secondaryStage.setTitle("Show Users");
-            secondaryStage.show();
-            primaryStage.close();
-        } else {
-            // Passwords don't match, show error message
-            showDialog("Registration Failed", "Passwords do not match, please try again.", Alert.AlertType.ERROR);
-        }
-    } catch (Exception e) {
-        e.printStackTrace();
-        showDialog("Error", "An error occurred during registration. Please try again.", Alert.AlertType.ERROR);
-    }
+    new Thread(task).start();
 }
 
     // Handle Back to Login Button Click
