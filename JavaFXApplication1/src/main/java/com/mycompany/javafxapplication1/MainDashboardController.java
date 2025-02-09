@@ -87,15 +87,29 @@ private void handleTerminal(ActionEvent event) {
 
     // Handle File Management Button (Only accessible by Admins)
     @FXML
-private void handleFileManagement(ActionEvent event) {
-    if ("admin".equals(userRole)) {
-        // Admin can access all files
-        openFileManagementWindow();
-    } else {
-        // User can only access their own files (add your logic here)
-        openFileManagementWindow();
+    private void handleFileManagement(ActionEvent event) {
+        new Thread(() -> {
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/fileManagement.fxml"));
+                Parent root = loader.load();
+
+                // Pass the user role to FileManagementController
+                FileManagementController controller = loader.getController();
+                controller.setUserRole(userRole);
+
+                // Open in JavaFX Application Thread
+                javafx.application.Platform.runLater(() -> {
+                    Stage fileManagementStage = new Stage();
+                    fileManagementStage.setTitle("File Management");
+                    fileManagementStage.setScene(new Scene(root, 800, 600));
+                    fileManagementStage.show();
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
-}
+
 
 private void openFileManagementWindow() {
     try {
