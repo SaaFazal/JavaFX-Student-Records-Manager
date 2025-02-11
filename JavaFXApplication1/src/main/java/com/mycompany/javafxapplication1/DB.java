@@ -173,7 +173,7 @@ public class DB {
         statement.setQueryTimeout(timeout);
         ResultSet rs = statement.executeQuery("select * from " + this.dataBaseTableName);
         while (rs.next()) {
-            // Use the constructor that takes user, pass, and role, as you defined in your User class
+            // Use the constructor that takes user, pass, and role, as defined in User class
             result.add(new User(rs.getString("name"), rs.getString("password"), rs.getString("role")));
         }
 
@@ -208,7 +208,7 @@ public class DB {
             statement.setQueryTimeout(timeout);
             ResultSet rs = statement.executeQuery("select name, password from " + this.dataBaseTableName);
             String inPass = generateSecurePassword(pass);
-            // Iterate through the java ResultSet
+            
             while (rs.next()) {
                 if (user.equals(rs.getString("name")) && rs.getString("password").equals(inPass)) {
                     flag = true;
@@ -258,7 +258,7 @@ public class DB {
                 System.err.println(e.getMessage());
             }
         }
-        return role;  // Returns the role (e.g., 'admin', 'user', etc.)
+        return role;  // Returns the role ('admin', 'user')
     }
 
     private String getSaltvalue(int length) {

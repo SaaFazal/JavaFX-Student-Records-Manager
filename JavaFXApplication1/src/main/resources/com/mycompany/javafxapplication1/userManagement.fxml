@@ -20,8 +20,11 @@
     <Button text="Update" onAction="#handleUpdate" />
     <Button text="Add" onAction="#handleAdd" />
     <Button text="Delete" onAction="#handleDelete" />
+    <Button text="Back" onAction="#handleBack" 
+            style="-fx-background-color: #3498db; -fx-text-fill: white;"/>
  </HBox>   
     <Button text="Close" onAction="#closeWindow"/>
+    
     
 
 </VBox>

@@ -85,8 +85,8 @@ public class RegisterController {
 private void registerBtnHandler(ActionEvent event) {
     System.out.println("Register button clicked.");
 
-    Task<Void> task = new Task<Void>() {
-        @Override
+    Task<Void> task = new Task<Void>() {   
+        @Override                                         // @Override instructs the compiler to override this method
         protected Void call() throws Exception {
             try {
                 System.out.println("Initializing database connection...");
@@ -140,7 +140,7 @@ private void registerBtnHandler(ActionEvent event) {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("primary.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 1000, 700);  
+            Scene scene = new Scene(root, 1200, 800);  
             Stage secondaryStage = new Stage();
             secondaryStage.setScene(scene);
             secondaryStage.setTitle("Login");

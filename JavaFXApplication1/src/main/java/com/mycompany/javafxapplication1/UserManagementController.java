@@ -4,6 +4,7 @@
  */
 package com.mycompany.javafxapplication1;
 
+import java.io.IOException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -16,6 +17,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.TextInputDialog;
 
 public class UserManagementController {
 
@@ -80,12 +86,50 @@ private void handleUpdate() {
 
 @FXML
 private void handleAdd() {
-    // Logic to add a new user
+    // Open a dialog to add a new user
+    TextInputDialog dialog = new TextInputDialog();
+    dialog.setTitle("Add User");
+    dialog.setHeaderText("Enter username:");
+    Optional<String> result = dialog.showAndWait();
+    result.ifPresent(username -> {
+        // Add user to database (implement your logic)
+        DB myObj = new DB();
+        try {
+            myObj.addDataToDB(username, "defaultPassword", "user");
+            loadUsers(); // Refresh table
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    });
 }
 
 @FXML
 private void handleDelete() {
-    // Logic to delete a user
+    User selectedUser = userTable.getSelectionModel().getSelectedItem();
+    if (selectedUser != null) {
+        // Delete user from database
+        try (Connection conn = DB.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE name = ?")) {
+            stmt.setString(1, selectedUser.getUser());
+            stmt.executeUpdate();
+            loadUsers(); // Refresh table
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+@FXML
+private void handleBack() {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
+        Parent root = loader.load();
+        Stage stage = (Stage) userTable.getScene().getWindow();
+        stage.setScene(new Scene(root, 1200, 800));
+        stage.show();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
 }
 }
 

@@ -61,7 +61,7 @@ private void switchToSecondary() {
         MainDashboardController dashboardController = loader.getController();
         dashboardController.setUserRole(currentUserRole); // Pass role to MainDashboardController
 
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1200, 800);
         primaryStage.setScene(scene);
         primaryStage.show();
     } catch (Exception e) {
@@ -75,7 +75,7 @@ private void switchToSecondary() {
             FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
             Parent root = loader.load();
             Stage newStage = new Stage();
-            newStage.setScene(new Scene(root, 1000, 700));
+            newStage.setScene(new Scene(root, 1200, 800));
             newStage.setTitle(title);
             newStage.show();
             ((Stage) registerBtn.getScene().getWindow()).hide();

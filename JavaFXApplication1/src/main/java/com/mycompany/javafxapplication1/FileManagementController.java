@@ -9,11 +9,18 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.stage.Stage;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.stream.Collectors;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 
 public class FileManagementController {
 
@@ -24,9 +31,9 @@ public class FileManagementController {
     private Button addFileBtn, updateFileBtn, deleteFileBtn;
 
     private String userRole;
-    private String currentUser = "user123"; // Replace this with actual logged-in username
+    private String currentUser = "user123"; 
 
-    private static final String FILE_DIRECTORY = "/home/ntu-user/NetBeansProjects/cwk/JavaFXApplication1/"; // Change this to your actual file path
+    private static final String FILE_DIRECTORY = "/home/ntu-user/NetBeansProjects/cwk/JavaFXApplication1/"; 
 
     public void setUserRole(String role) {
         this.userRole = role;
@@ -48,13 +55,13 @@ public class FileManagementController {
             // Admin can see all files
             fileNames = FXCollections.observableArrayList(Arrays.stream(files)
                     .map(File::getName)
-                    .collect(Collectors.toList())); // Replace toList() with collect(Collectors.toList())
+                    .collect(Collectors.toList())); 
         } else {
             // Users can only see their own files
             fileNames = FXCollections.observableArrayList(Arrays.stream(files)
-                    .filter(file -> file.getName().startsWith(currentUser + "_")) // Naming convention: user123_file.txt
+                    .filter(file -> file.getName().startsWith(currentUser + "_")) 
                     .map(File::getName)
-                    .collect(Collectors.toList())); // Replace toList() with collect(Collectors.toList())
+                    .collect(Collectors.toList())); 
         }
 
         fileListView.setItems(fileNames);
@@ -62,17 +69,48 @@ public class FileManagementController {
 
     @FXML
     private void handleAddFile() {
-        System.out.println("Add File Clicked"); // Implement file creation logic
+    FileChooser fileChooser = new FileChooser();
+    File selectedFile = fileChooser.showOpenDialog(addFileBtn.getScene().getWindow());
+    if (selectedFile != null) {
+        // Copy file to FILE_DIRECTORY with user prefix
+        String newFileName = currentUser + "_" + selectedFile.getName();
+        File dest = new File(FILE_DIRECTORY + newFileName);
+        try {
+            Files.copy(selectedFile.toPath(), dest.toPath());
+            loadFiles(); // Refresh list
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+}
 
     @FXML
     private void handleUpdateFile() {
-        System.out.println("Update File Clicked"); // Implement file update logic
+        System.out.println("Update File Clicked"); 
     }
 
     @FXML
     private void handleDeleteFile() {
-        System.out.println("Delete File Clicked"); // Implement file deletion logic
+    String selectedFile = fileListView.getSelectionModel().getSelectedItem();
+    if (selectedFile != null) {
+        File fileToDelete = new File(FILE_DIRECTORY + selectedFile);
+        if (fileToDelete.delete()) {
+            loadFiles(); // Refresh list
+        }
     }
+}
+    
+    @FXML
+private void handleBack() {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
+        Parent root = loader.load();
+        Stage stage = (Stage) addFileBtn.getScene().getWindow();
+        stage.setScene(new Scene(root, 1200, 800));
+        stage.show();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+}
 }
 

@@ -49,7 +49,7 @@ public class SecondaryController {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getClass().getResource("primary.fxml"));
             Parent root = loader.load();
-            Scene scene = new Scene(root, 640, 480);
+            Scene scene = new Scene(root, 1200, 800);
             secondaryStage.setScene(scene);
             secondaryStage.setTitle("Login");
             secondaryStage.show();

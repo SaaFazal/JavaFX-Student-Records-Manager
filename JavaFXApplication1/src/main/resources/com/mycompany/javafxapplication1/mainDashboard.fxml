@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.geometry.Pos?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.control.Label?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.javafxapplication1.MainDashboardController"
-      alignment="CENTER" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 30;">
-    <Button fx:id="userManagementBtn" text="User Management" onAction="#handleUserManagement"
-            style="-fx-font-size: 16; -fx-background-color: #3498db; -fx-text-fill: white; -fx-pref-width: 200;"/>
-    <Button fx:id="terminalBtn" text="Terminal" onAction="#handleTerminal"
-            style="-fx-font-size: 16; -fx-background-color: #27ae60; -fx-text-fill: white; -fx-pref-width: 200;"/>
-    <Button fx:id="fileManagementBtn" text="File Management" onAction="#handleFileManagement"
-            style="-fx-font-size: 16; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-pref-width: 200;"/>
+
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.javafxapplication1.MainDashboardController" 
+      alignment="CENTER" spacing="20" style="-fx-background-color: #2c3e50;">
+    <padding>
+        <Insets top="20" right="20" bottom="20" left="20"/>
+    </padding>
+    <children>
+        <Label text="Main Dashboard" style="-fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;" />
+        <Button fx:id="userManagementBtn" text="User Management" onAction="#handleUserManagement" 
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;" />
+        <Button fx:id="fileManagementBtn" text="File Management" onAction="#handleFileManagement" 
+                style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;" />
+        <Button fx:id="terminalBtn" text="Terminal" onAction="#handleTerminal" 
+                style="-fx-background-color: #e67e22; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;" />
+        <HBox alignment="CENTER" spacing="10">
+            <Button text="Return to Login" onAction="#handleLogout" 
+                    style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;" />
+        </HBox>
+    </children>
 </VBox>
-

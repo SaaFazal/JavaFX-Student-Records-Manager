@@ -77,7 +77,7 @@ private void backButtonHandler() {
         stage.close();
 
         // Reuse the existing stage (MainDashboard)
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1200, 800);
         stage.setScene(scene);
         stage.setTitle("Main Dashboard");
         stage.show();

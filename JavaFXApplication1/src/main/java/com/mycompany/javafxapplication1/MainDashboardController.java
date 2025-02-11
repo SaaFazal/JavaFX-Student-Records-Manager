@@ -4,6 +4,7 @@
  */
 package com.mycompany.javafxapplication1;
 
+import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.stage.Stage;
@@ -37,7 +38,7 @@ private void handleUserManagement(ActionEvent event) {
 
         Stage userManagementStage = new Stage();
         userManagementStage.setTitle("User Management");
-        userManagementStage.setScene(new Scene(root, 500, 400));
+        userManagementStage.setScene(new Scene(root, 1200, 800));
         userManagementStage.show();
     } catch (Exception e) {
         e.printStackTrace();
@@ -56,10 +57,10 @@ private void updateButtonVisibility() {
         terminalBtn.setVisible(true);
         fileManagementBtn.setVisible(true);
     } else {
-        // Users can see all buttons except User Management
-        userManagementBtn.setVisible(true);  // Users can manage their account
-        terminalBtn.setVisible(true); // Users can access terminal
-        fileManagementBtn.setVisible(true);  // Users can access file management too
+        // Users can see all buttons except they can manage their own
+        userManagementBtn.setVisible(true);  
+        terminalBtn.setVisible(true); 
+        fileManagementBtn.setVisible(true);  
     }
 }
 
@@ -77,7 +78,7 @@ private void handleTerminal(ActionEvent event) {
 
         // Open the terminal window
         Stage terminalStage = new Stage();
-        terminalStage.setScene(new Scene(root, 1000, 700));
+        terminalStage.setScene(new Scene(root, 1200, 800));
         terminalStage.setTitle("Terminal");
         terminalStage.show();
     } catch (Exception e) {
@@ -97,11 +98,11 @@ private void handleTerminal(ActionEvent event) {
                 FileManagementController controller = loader.getController();
                 controller.setUserRole(userRole);
 
-                // Open in JavaFX Application Thread
+                // Open in JavaFX Application Thread (to run the window without any interupptions)
                 javafx.application.Platform.runLater(() -> {
                     Stage fileManagementStage = new Stage();
                     fileManagementStage.setTitle("File Management");
-                    fileManagementStage.setScene(new Scene(root, 800, 600));
+                    fileManagementStage.setScene(new Scene(root, 1200, 800));
                     fileManagementStage.show();
                 });
             } catch (Exception e) {
@@ -115,12 +116,31 @@ private void openFileManagementWindow() {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/fileManagement.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root, 1000, 700);
+        Scene scene = new Scene(root, 1200, 800);
         Stage fileManagementStage = new Stage();
         fileManagementStage.setTitle("File Management");
         fileManagementStage.setScene(scene);
         fileManagementStage.show();
     } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+@FXML
+private void handleLogout(ActionEvent event) {
+    try {
+        // Load the login screen
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/primary.fxml"));
+        Parent root = loader.load();
+
+        // Get the current stage
+        Stage stage = (Stage) userManagementBtn.getScene().getWindow();
+
+        // Set the new scene
+        Scene scene = new Scene(root, 1200, 800);
+        stage.setScene(scene);
+        stage.setTitle("Login");
+        stage.show();
+    } catch (IOException e) {
         e.printStackTrace();
     }
 }
