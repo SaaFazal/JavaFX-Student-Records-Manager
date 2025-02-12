@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" 
+      fx:controller="com.mycompany.javafxapplication1.TextEditorController"
+      spacing="10" style="-fx-padding: 10;">
+    
+    <TextArea fx:id="contentArea" wrapText="true" style="-fx-min-height: 400px;"/>
+    
+    <Button text="Save" onAction="#handleSave" style="-fx-pref-width: 100;"/>
+    <Button text="Close" onAction="#handleClose" style="-fx-pref-width: 100;"/>
+</VBox>

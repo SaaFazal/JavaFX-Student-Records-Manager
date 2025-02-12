@@ -7,12 +7,13 @@ package com.mycompany.javafxapplication1;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import java.util.stream.Collectors;
@@ -20,7 +21,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.TextInputDialog;
 import javafx.stage.FileChooser;
+
 
 public class FileManagementController {
 
@@ -29,9 +32,12 @@ public class FileManagementController {
     
     @FXML
     private Button addFileBtn, updateFileBtn, deleteFileBtn;
+    
+    @FXML
+    private Button openFileBtn;
 
     private String userRole;
-    private String currentUser = "user123"; 
+    private String currentUser; // Dynamically set
 
     private static final String FILE_DIRECTORY = "/home/ntu-user/NetBeansProjects/cwk/JavaFXApplication1/"; 
 
@@ -40,77 +46,136 @@ public class FileManagementController {
         loadFiles();
     }
 
-    private void loadFiles() {
+    public void setCurrentUser(String user) {
+    this.currentUser = user;
+    loadFiles();  
+}
+
+     private void loadFiles() {
         File directory = new File(FILE_DIRECTORY);
         if (!directory.exists() || !directory.isDirectory()) {
-            System.out.println("Invalid directory: " + FILE_DIRECTORY);
+            showAlert("Error", "Invalid directory");
             return;
         }
 
         File[] files = directory.listFiles();
         if (files == null) return;
 
-        ObservableList<String> fileNames;
-        if ("admin".equals(userRole)) {
-            // Admin can see all files
-            fileNames = FXCollections.observableArrayList(Arrays.stream(files)
-                    .map(File::getName)
-                    .collect(Collectors.toList())); 
-        } else {
-            // Users can only see their own files
-            fileNames = FXCollections.observableArrayList(Arrays.stream(files)
-                    .filter(file -> file.getName().startsWith(currentUser + "_")) 
-                    .map(File::getName)
-                    .collect(Collectors.toList())); 
+        fileListView.getItems().clear();
+        for (File file : files) {
+            if (userRole.equals("admin") || file.getName().startsWith(currentUser + "_")) {
+                fileListView.getItems().add(file.getName());
+            }
         }
-
-        fileListView.setItems(fileNames);
     }
 
     @FXML
     private void handleAddFile() {
-    FileChooser fileChooser = new FileChooser();
-    File selectedFile = fileChooser.showOpenDialog(addFileBtn.getScene().getWindow());
-    if (selectedFile != null) {
-        // Copy file to FILE_DIRECTORY with user prefix
-        String newFileName = currentUser + "_" + selectedFile.getName();
-        File dest = new File(FILE_DIRECTORY + newFileName);
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("New File");
+        dialog.setHeaderText("Enter filename:");
+        
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(filename -> createFile(filename));
+    }
+
+    private void createFile(String filename) {
         try {
-            Files.copy(selectedFile.toPath(), dest.toPath());
-            loadFiles(); // Refresh list
+            String prefix = userRole.equals("admin") ? "" : currentUser + "_";
+            File newFile = new File(FILE_DIRECTORY + prefix + filename);
+            if (newFile.createNewFile()) {
+                loadFiles();
+            } else {
+                showAlert("Error", "File already exists");
+            }
         } catch (IOException e) {
-            e.printStackTrace();
+            showAlert("Error", "File creation failed: " + e.getMessage());
         }
     }
-}
+@FXML
+private void handleUpdateFile() {
+    String selected = fileListView.getSelectionModel().getSelectedItem();
+    if (selected == null) return;
 
-    @FXML
-    private void handleUpdateFile() {
-        System.out.println("Update File Clicked"); 
+    try {
+        File file = new File(FILE_DIRECTORY + selected);
+        
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("TextEditor.fxml"));
+        Parent root = loader.load();
+        
+        TextEditorController controller = loader.getController();
+        controller.loadFile(file);
+        
+        Stage editorStage = new Stage();
+        editorStage.setTitle("Editing: " + file.getName());
+        editorStage.setScene(new Scene(root, 600, 500));
+        editorStage.show();
+    } catch (IOException e) {
+        showAlert("Error", "Failed to open editor: " + e.getMessage());
     }
+}
 
     @FXML
     private void handleDeleteFile() {
-    String selectedFile = fileListView.getSelectionModel().getSelectedItem();
-    if (selectedFile != null) {
-        File fileToDelete = new File(FILE_DIRECTORY + selectedFile);
-        if (fileToDelete.delete()) {
-            loadFiles(); // Refresh list
+        String selectedFileName = fileListView.getSelectionModel().getSelectedItem();
+        if (selectedFileName == null) {
+            showAlert("Error", "No file selected. Please select a file to delete.");
+            return;
+        }
+
+        if (!"admin".equals(userRole)) {
+        if (!selectedFileName.startsWith(currentUser + "_")) {
+            showAlert("Permission Denied", "You can only delete your own files");
+            return;
         }
     }
-}
-    
-    @FXML
-private void handleBack() {
-    try {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
+
+
+        File fileToDelete = new File(FILE_DIRECTORY + selectedFileName);
+        if (fileToDelete.delete()) {
+            loadFiles();
+        } else {
+            showAlert("Error", "Failed to delete the file.");
+        }
+    }
+     @FXML
+    private void handleOpenFile() {
+        String selected = fileListView.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            openFileInEditor(selected);
+        }
+    }
+private void openFileInEditor(String filename) {
+        try {
+        File file = new File(FILE_DIRECTORY + filename);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("TextEditor.fxml"));
         Parent root = loader.load();
-        Stage stage = (Stage) addFileBtn.getScene().getWindow();
-        stage.setScene(new Scene(root, 1200, 800));
-        stage.show();
+        
+        TextEditorController controller = loader.getController();
+        controller.loadFile(file);
+        controller.setReadOnlyMode(!userRole.equals("admin"));  
+        
+        Stage editorStage = new Stage();
+        editorStage.setTitle("Viewing: " + file.getName());
+        editorStage.setScene(new Scene(root, 600, 500));
+        editorStage.show();
     } catch (IOException e) {
-        e.printStackTrace();
+        showAlert("Error", "Failed to open file: " + e.getMessage());
     }
 }
+
+
+    @FXML
+private void handleBack() {
+    Stage stage = (Stage) addFileBtn.getScene().getWindow();
+    stage.close();
 }
 
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+}

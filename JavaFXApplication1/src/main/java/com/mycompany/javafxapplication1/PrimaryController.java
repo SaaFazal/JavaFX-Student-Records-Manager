@@ -30,26 +30,41 @@ public class PrimaryController {
         switchScene("/com/mycompany/javafxapplication1/register.fxml", "Register a new User");
     }
 
-    @FXML
+    // Update the login handler to pass both user details
+@FXML
 private void switchToSecondary() {
     Stage primaryStage = (Stage) registerBtn.getScene().getWindow();
     try {
         DB myObj = new DB();
-        if (myObj.validateUser(userTextField.getText(), passPasswordField.getText())) {
-            currentUserRole = myObj.getUserRole(userTextField.getText()); // Fetch user role
-            if (currentUserRole != null) {
-                // Set the current user
-                User.currentUser = new User(userTextField.getText(), passPasswordField.getText(), currentUserRole);
-                showMainDashboard(primaryStage);
-            } else {
-                showAlert("Role Fetching Error", "Failed to fetch the user role.");
-            }
+        String username = userTextField.getText();
+        String password = passPasswordField.getText();
+        
+        if (myObj.validateUser(username, password)) {
+            String role = myObj.getUserRole(username);
+            String currentUser = username;  // Get actual username
+            
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(
+                "/com/mycompany/javafxapplication1/mainDashboard.fxml"
+            ));
+            Parent root = loader.load();
+            
+            MainDashboardController controller = loader.getController();
+            controller.setUserRole(role);
+            controller.setCurrentUser(currentUser);  // Pass username
+            
+            primaryStage.setScene(new Scene(root, 1200, 800));
         } else {
-            showAlert("Invalid User Name / Password", "Please try again!");
+            showAlert("Login Failed", "Invalid credentials");
         }
     } catch (Exception e) {
         e.printStackTrace();
     }
+}
+
+
+@FXML
+private void openFileManagement(ActionEvent event) {
+    switchScene("/com/mycompany/javafxapplication1/fileManagement.fxml", "File Management");
 }
 
     private void showMainDashboard(Stage primaryStage) {
@@ -87,15 +102,6 @@ private void switchToSecondary() {
     @FXML
     private void openTerminal(ActionEvent event) {
         switchScene("/com/mycompany/javafxapplication1/terminal.fxml", "Terminal");
-    }
-
-    @FXML
-    private void openFileManagement(ActionEvent event) {
-        if ("admin".equals(currentUserRole)) {
-            switchScene("/com/mycompany/javafxapplication1/fileManagement.fxml", "File Management");
-        } else {
-            showAlert("Access Denied", "You do not have sufficient privileges.");
-        }
     }
 
     private void showAlert(String header, String content) {

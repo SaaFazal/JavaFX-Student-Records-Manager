@@ -4,6 +4,7 @@
  */
 package com.mycompany.javafxapplication1;
 
+import static com.mycompany.javafxapplication1.User.currentUser;
 import java.io.IOException;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -29,9 +30,15 @@ public class MainDashboardController {
     @FXML
     private String userRole;
     
+    private String currentUser;
+
+public void setCurrentUser(String user) {
+    this.currentUser = user;
+}
+
     // Handle User Management Button
     @FXML
-private void handleUserManagement(ActionEvent event) {
+private void handleUserManagement(ActionEvent event) throws IOException {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/userManagement.fxml"));
         Parent root = loader.load();
@@ -41,9 +48,10 @@ private void handleUserManagement(ActionEvent event) {
         userManagementStage.setScene(new Scene(root, 1200, 800));
         userManagementStage.show();
     } catch (Exception e) {
-        e.printStackTrace();
+        showAlert("Error", "Failed to open user management: " + e.getMessage());
     }
 }
+
    @FXML
 public void setUserRole(String role) {
     this.userRole = role;
@@ -51,17 +59,10 @@ public void setUserRole(String role) {
 }
 @FXML
 private void updateButtonVisibility() {
-    if ("admin".equals(userRole)) {
-        // Admin can see all buttons
-        userManagementBtn.setVisible(true);
-        terminalBtn.setVisible(true);
-        fileManagementBtn.setVisible(true);
-    } else {
-        // Users can see all buttons except they can manage their own
-        userManagementBtn.setVisible(true);  
-        terminalBtn.setVisible(true); 
-        fileManagementBtn.setVisible(true);  
-    }
+    boolean isAdmin = "admin".equals(userRole);
+    userManagementBtn.setVisible(true);  
+    terminalBtn.setVisible(true);
+    fileManagementBtn.setVisible(true);
 }
 
 
@@ -87,29 +88,27 @@ private void handleTerminal(ActionEvent event) {
 }
 
     // Handle File Management Button (Only accessible by Admins)
-    @FXML
-    private void handleFileManagement(ActionEvent event) {
-        new Thread(() -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/fileManagement.fxml"));
-                Parent root = loader.load();
+   @FXML
+private void handleFileManagement(ActionEvent event) {
+    try {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(
+            "/com/mycompany/javafxapplication1/fileManagement.fxml"
+        ));
+        Parent root = loader.load();
 
-                // Pass the user role to FileManagementController
-                FileManagementController controller = loader.getController();
-                controller.setUserRole(userRole);
+        // Pass both role and username to file management
+        FileManagementController controller = loader.getController();
+        controller.setUserRole(userRole);
+        controller.setCurrentUser(currentUser); 
 
-                // Open in JavaFX Application Thread (to run the window without any interupptions)
-                javafx.application.Platform.runLater(() -> {
-                    Stage fileManagementStage = new Stage();
-                    fileManagementStage.setTitle("File Management");
-                    fileManagementStage.setScene(new Scene(root, 1200, 800));
-                    fileManagementStage.show();
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }).start();
+        Stage fileManagementStage = new Stage();
+        fileManagementStage.setTitle("File Management");
+        fileManagementStage.setScene(new Scene(root, 1200, 800));
+        fileManagementStage.show();
+    } catch (Exception e) {
+        showAlert("Error", "Failed to open file manager: " + e.getMessage());
     }
+}
 
 
 private void openFileManagementWindow() {

@@ -5,6 +5,7 @@
 package com.mycompany.javafxapplication1;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import javafx.fxml.FXML;
@@ -33,13 +34,11 @@ public class TerminalController {
     private Button backButton; // Added back button
 
     @FXML
-    private void onEnterButtonClicked() {
-        String command = commandInput.getText();
-        if (command.isEmpty()) {
-            showError("Empty Command", "Please enter a command to execute.");
-            return;
-        }
-
+private void onEnterButtonClicked() {
+    String command = commandInput.getText().trim();
+    if (command.startsWith("nano ")) {
+        handleNanoCommand(command);
+    } else {
         try {
             ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", command);
             Process process = processBuilder.start();
@@ -55,34 +54,25 @@ public class TerminalController {
             showError("Command Execution Failed", "There was an error executing the command.");
         }
     }
+    commandInput.clear();
+}
 
     @FXML
 private void backButtonHandler() {
+    Stage stage = (Stage) backButton.getScene().getWindow();
+    stage.close();
+}
+
+private void handleNanoCommand(String command) {
+    String filename = command.substring(5).trim();
     try {
-        // Check if the user is logged in
-        if (User.currentUser == null) {
-            showError("Error", "User is not logged in or session expired.");
-            return;
-        }
-
-        // Load the Main Dashboard FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
-        Parent root = loader.load();
-
-        // Get the controller for MainDashboard
-        MainDashboardController dashboardController = loader.getController();
-        dashboardController.setUserRole(User.currentUser.getRole());  // Pass the role to the MainDashboard
-
-        // Close the terminal window
-        stage.close();
-
-        // Reuse the existing stage (MainDashboard)
-        Scene scene = new Scene(root, 1200, 800);
-        stage.setScene(scene);
-        stage.setTitle("Main Dashboard");
-        stage.show();
-    } catch (IOException e) {
-        e.printStackTrace();
+        File file = new File(filename);
+        if (!file.exists()) file.createNewFile();
+        
+        Process process = new ProcessBuilder("gnome-terminal", "--", "nano", filename).start();
+        process.waitFor();
+    } catch (Exception e) {
+        showError("Editor Error", "Failed to open nano editor");
     }
 }
 private Stage stage;

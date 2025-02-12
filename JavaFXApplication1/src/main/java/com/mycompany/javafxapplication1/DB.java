@@ -22,6 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -199,67 +200,36 @@ public class DB {
      * @param pass plain password of type String
      * @return true if the credentials are valid, otherwise false
      */
-    public boolean validateUser(String user, String pass) throws InvalidKeySpecException, ClassNotFoundException {
-        Boolean flag = false;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(fileName);
-            var statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet rs = statement.executeQuery("select name, password from " + this.dataBaseTableName);
-            String inPass = generateSecurePassword(pass);
-            
-            while (rs.next()) {
-                if (user.equals(rs.getString("name")) && rs.getString("password").equals(inPass)) {
-                    flag = true;
-                    break;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                System.err.println(e.getMessage());
-            }
+    public boolean validateUser(String user, String pass) throws Exception {
+    String sql = "SELECT password FROM users WHERE name = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, user);
+        ResultSet rs = pstmt.executeQuery();
+        
+        if (rs.next()) {
+            String storedHash = rs.getString("password");
+            String inputHash = generateSecurePassword(pass);
+            return storedHash.equals(inputHash);
         }
-
-        return flag;
+        return false;
     }
+}
 
     /**
      * @brief get the role of a user from the database
      * @param username name of the user
      * @return role of the user as String
      */
-    public String getUserRole(String username) throws ClassNotFoundException {
-        String role = null;
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection(fileName);
-            var statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
-            ResultSet rs = statement.executeQuery("SELECT role FROM " + this.dataBaseTableName + " WHERE name = '" + username + "'");
-            
-            if (rs.next()) {
-                role = rs.getString("role");
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                System.err.println(e.getMessage());
-            }
-        }
-        return role;  // Returns the role ('admin', 'user')
+    public String getUserRole(String username) throws Exception {
+    String sql = "SELECT role FROM users WHERE name = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, username);
+        ResultSet rs = pstmt.executeQuery();
+        return rs.next() ? rs.getString("role") : null;
     }
+}
 
     private String getSaltvalue(int length) {
         StringBuilder finalval = new StringBuilder(length);
@@ -305,67 +275,112 @@ public class DB {
     Class.forName("org.sqlite.JDBC");
     return DriverManager.getConnection(fileName);
 }
-
-
-
-
-
-//    public static void main(String[] args) throws InvalidKeySpecException {
-//        DB myObj = new DB();
-//        myObj.log("-------- Simple Tutorial on how to make JDBC connection to SQLite DB ------------");
-//        myObj.log("\n---------- Drop table ----------");
-//        myObj.delTable(myObj.getTableName());
-//        myObj.log("\n---------- Create table ----------");
-//        myObj.createTable(myObj.getTableName());
-//        myObj.log("\n---------- Adding Users ----------");
-//        myObj.addDataToDB("ntu-user", "12z34");
-//        myObj.addDataToDB("ntu-user2", "12yx4");
-//        myObj.addDataToDB("ntu-user3", "a1234");
-//        myObj.log("\n---------- get Data from the Table ----------");
-//        myObj.getDataFromTable(myObj.getTableName());
-//        myObj.log("\n---------- Validate users ----------");
-//        String[] users = new String[]{"ntu-user", "ntu-user", "ntu-user1"};
-//        String[] passwords = new String[]{"12z34", "1235", "1234"};
-//        String[] messages = new String[]{"VALID user and password",
-//            "VALID user and INVALID password", "INVALID user and VALID password"};
-//
-//        for (int i = 0; i < 3; i++) {
-//            System.out.println("Testing " + messages[i]);
-//            if (myObj.validateUser(users[i], passwords[i], myObj.getTableName())) {
-//                myObj.log("++++++++++VALID credentials!++++++++++++");
-//            } else {
-//                myObj.log("----------INVALID credentials!----------");
-//            }
-//        }
-//    }
-
-
-//    public static void main(String[] args) throws InvalidKeySpecException {
-//        DB myObj = new DB();
-//        myObj.log("-------- Simple Tutorial on how to make JDBC connection to SQLite DB ------------");
-//        myObj.log("\n---------- Drop table ----------");
-//        myObj.delTable(myObj.getTableName());
-//        myObj.log("\n---------- Create table ----------");
-//        myObj.createTable(myObj.getTableName());
-//        myObj.log("\n---------- Adding Users ----------");
-//        myObj.addDataToDB("ntu-user", "12z34");
-//        myObj.addDataToDB("ntu-user2", "12yx4");
-//        myObj.addDataToDB("ntu-user3", "a1234");
-//        myObj.log("\n---------- get Data from the Table ----------");
-//        myObj.getDataFromTable(myObj.getTableName());
-//        myObj.log("\n---------- Validate users ----------");
-//        String[] users = new String[]{"ntu-user", "ntu-user", "ntu-user1"};
-//        String[] passwords = new String[]{"12z34", "1235", "1234"};
-//        String[] messages = new String[]{"VALID user and password",
-//            "VALID user and INVALID password", "INVALID user and VALID password"};
-//
-//        for (int i = 0; i < 3; i++) {
-//            System.out.println("Testing " + messages[i]);
-//            if (myObj.validateUser(users[i], passwords[i], myObj.getTableName())) {
-//                myObj.log("++++++++++VALID credentials!++++++++++++");
-//            } else {
-//                myObj.log("----------INVALID credentials!----------");
-//            }
-//        }
-//    }
+    // Add these methods to your DB class
+public void addUser(String username, String password, String role) throws SQLException {
+    String sql = "INSERT INTO users (name, password, role) VALUES (?, ?, ?)";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, username);
+        pstmt.setString(2, generateSecurePassword(password));
+        pstmt.setString(3, role);
+        pstmt.executeUpdate();
+    } catch (InvalidKeySpecException | ClassNotFoundException e) {
+        throw new SQLException("Password hashing failed", e);
+    }
 }
+
+public void updateUserRole(String username, String newRole) throws SQLException, ClassNotFoundException {
+    String sql = "UPDATE users SET role = ? WHERE name = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, newRole);
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    }
+}
+
+public void deleteUser(String username) throws SQLException, ClassNotFoundException {
+    String sql = "DELETE FROM users WHERE name = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, username);
+        pstmt.executeUpdate();
+    }
+}
+
+    public void updateUserPassword(String username, String newPassword) throws SQLException {
+    String sql = "UPDATE users SET password = ? WHERE name = ?";
+    try (Connection conn = getConnection();
+         PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        pstmt.setString(1, generateSecurePassword(newPassword));
+        pstmt.setString(2, username);
+        pstmt.executeUpdate();
+    } catch (InvalidKeySpecException | ClassNotFoundException e) {
+        throw new SQLException("Password update failed", e);
+    }
+}
+}
+
+
+
+
+
+//    public static void main(String[] args) throws InvalidKeySpecException {
+//        DB myObj = new DB();
+//        myObj.log("-------- Simple Tutorial on how to make JDBC connection to SQLite DB ------------");
+//        myObj.log("\n---------- Drop table ----------");
+//        myObj.delTable(myObj.getTableName());
+//        myObj.log("\n---------- Create table ----------");
+//        myObj.createTable(myObj.getTableName());
+//        myObj.log("\n---------- Adding Users ----------");
+//        myObj.addDataToDB("ntu-user", "12z34");
+//        myObj.addDataToDB("ntu-user2", "12yx4");
+//        myObj.addDataToDB("ntu-user3", "a1234");
+//        myObj.log("\n---------- get Data from the Table ----------");
+//        myObj.getDataFromTable(myObj.getTableName());
+//        myObj.log("\n---------- Validate users ----------");
+//        String[] users = new String[]{"ntu-user", "ntu-user", "ntu-user1"};
+//        String[] passwords = new String[]{"12z34", "1235", "1234"};
+//        String[] messages = new String[]{"VALID user and password",
+//            "VALID user and INVALID password", "INVALID user and VALID password"};
+//
+//        for (int i = 0; i < 3; i++) {
+//            System.out.println("Testing " + messages[i]);
+//            if (myObj.validateUser(users[i], passwords[i], myObj.getTableName())) {
+//                myObj.log("++++++++++VALID credentials!++++++++++++");
+//            } else {
+//                myObj.log("----------INVALID credentials!----------");
+//            }
+//        }
+//    }
+
+
+//    public static void main(String[] args) throws InvalidKeySpecException {
+//        DB myObj = new DB();
+//        myObj.log("-------- Simple Tutorial on how to make JDBC connection to SQLite DB ------------");
+//        myObj.log("\n---------- Drop table ----------");
+//        myObj.delTable(myObj.getTableName());
+//        myObj.log("\n---------- Create table ----------");
+//        myObj.createTable(myObj.getTableName());
+//        myObj.log("\n---------- Adding Users ----------");
+//        myObj.addDataToDB("ntu-user", "12z34");
+//        myObj.addDataToDB("ntu-user2", "12yx4");
+//        myObj.addDataToDB("ntu-user3", "a1234");
+//        myObj.log("\n---------- get Data from the Table ----------");
+//        myObj.getDataFromTable(myObj.getTableName());
+//        myObj.log("\n---------- Validate users ----------");
+//        String[] users = new String[]{"ntu-user", "ntu-user", "ntu-user1"};
+//        String[] passwords = new String[]{"12z34", "1235", "1234"};
+//        String[] messages = new String[]{"VALID user and password",
+//            "VALID user and INVALID password", "INVALID user and VALID password"};
+//
+//        for (int i = 0; i < 3; i++) {
+//            System.out.println("Testing " + messages[i]);
+//            if (myObj.validateUser(users[i], passwords[i], myObj.getTableName())) {
+//                myObj.log("++++++++++VALID credentials!++++++++++++");
+//            } else {
+//                myObj.log("----------INVALID credentials!----------");
+//            }
+//        }
+//    }
+
