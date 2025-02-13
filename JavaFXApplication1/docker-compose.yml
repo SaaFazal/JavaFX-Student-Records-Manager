@@ -13,39 +13,58 @@ services:
     networks:
       - comp20081_network
 
-  comp20081-files-container1:
-    container_name: comp20081-files-container1
+  load-balancer:
+    container_name: load-balancer
+    image: pedrombmachado/ntu_lubuntu:comp20081
+    ports:
+      - "22:22"
+      - "1234:1234"
+    hostname: load-balancer
+    networks:
+      - comp20081_network
+
+  mysql-server:
+    container_name: mysql-server
+    image: pedrombmachado/ntu_lubuntu:comp20081
+    ports:
+      - "4848:22"
+    hostname: mysql-server
+    networks:
+      - comp20081_network
+
+  file-server-1:
+    container_name: file-server-1
     image: pedrombmachado/simple-ssh-container:base
     ports:
       - "4849:22"
-    hostname: comp20081-files-container1
+    hostname: file-server-1
     networks:
       - comp20081_network
 
-  comp20081-files-container2:
-    container_name: comp20081-files-container2
+  file-server-2:
+    container_name: file-server-2
     image: pedrombmachado/simple-ssh-container:base
     ports:
       - "4850:22"
-    hostname: comp20081-files-container2
+    hostname: file-server-2
     networks:
       - comp20081_network
 
-  comp20081-files-container3:
-    container_name: comp20081-files-container3
+  file-server-3:
+    container_name: file-server-3
     image: pedrombmachado/simple-ssh-container:base
     ports:
       - "4851:22"
-    hostname: comp20081-files-container3
+    hostname: file-server-3
     networks:
       - comp20081_network
 
-  comp20081-files-container4:
-    container_name: comp20081-files-container4
+  file-server-4:
+    container_name: file-server-4
     image: pedrombmachado/simple-ssh-container:base
     ports:
       - "4852:22"
-    hostname: comp20081-files-container4
+    hostname: file-server-4
     networks:
       - comp20081_network
 
