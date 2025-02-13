@@ -52,6 +52,12 @@ public class DB {
     private int keylength = 256;
     private String saltValue;
     
+    private static final String url = "jdbc:mysql://mysql-server:3306/Details";
+    private static final String username = "root";
+    private static final String password = "password";  // Replace with your MySQL password
+    private int mysqltimeout = 30;
+    private String mysqldataBaseTableName = "Users";
+    Connection cmysqlonnection = null;
     /**
      * @brief constructor - generates the salt if it doesn't exist or loads it from the file .salt
      */
@@ -84,7 +90,7 @@ public class DB {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(fileName);
             var statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
+            statement.setQueryTimeout(mysqltimeout);
             statement.executeUpdate("create table if not exists " + tableName + "(id integer primary key autoincrement, name string, password string, role string)");
 
         } catch (SQLException ex) {
@@ -110,7 +116,7 @@ public class DB {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(fileName);
             var statement = connection.createStatement();
-            statement.setQueryTimeout(timeout);
+            statement.setQueryTimeout(mysqltimeout);
             statement.executeUpdate("drop table if exists " + tableName);
         } catch (SQLException ex) {
             Logger.getLogger(DB.class.getName()).log(Level.SEVERE, null, ex);
@@ -123,6 +129,9 @@ public class DB {
                 System.err.println(e.getMessage());
             }
         }
+    }
+    public static Connection getMySQLConnection() throws SQLException {
+        return DriverManager.getConnection(url, username, password);
     }
 
     /**
@@ -139,7 +148,7 @@ public class DB {
         System.out.println("Database connection established."); // Log successful connection
 
         var statement = connection.createStatement();
-        statement.setQueryTimeout(timeout);
+        statement.setQueryTimeout(mysqltimeout);
 
         System.out.println("Inserting user into database..."); // Log insertion attempt
         statement.executeUpdate("insert into " + dataBaseTableName + " (name, password, role) values('" 
@@ -171,7 +180,7 @@ public class DB {
         Class.forName("org.sqlite.JDBC");
         connection = DriverManager.getConnection(fileName);
         var statement = connection.createStatement();
-        statement.setQueryTimeout(timeout);
+        statement.setQueryTimeout(mysqltimeout);
         ResultSet rs = statement.executeQuery("select * from " + this.dataBaseTableName);
         while (rs.next()) {
             // Use the constructor that takes user, pass, and role, as defined in User class

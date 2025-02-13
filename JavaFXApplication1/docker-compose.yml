@@ -12,6 +12,8 @@ services:
       - docker_comp20081:/home/ntu-user/NetBeansProjects
     networks:
       - comp20081_network
+    depends_on:
+      - load-balancer
 
   load-balancer:
     container_name: load-balancer
@@ -22,6 +24,11 @@ services:
     hostname: load-balancer
     networks:
       - comp20081_network
+    depends_on:
+      - file-server-1
+      - file-server-2
+      - file-server-3
+      - file-server-4
 
   mysql-server:
     container_name: mysql-server
@@ -33,13 +40,18 @@ services:
       - comp20081_network
 
   file-server-1:
-    container_name: file-server-1
-    image: pedrombmachado/simple-ssh-container:base
-    ports:
-      - "4849:22"
-    hostname: file-server-1
-    networks:
-      - comp20081_network
+  container_name: file-server-1
+  image: pedrombmachado/simple-ssh-container:base
+  ports:
+    - "4849:22"
+  hostname: file-server-1
+  networks:
+    - comp20081_network
+  healthcheck:
+    test: ["CMD", "ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "root@localhost", "exit"]   #Health Check 
+    interval: 30s
+    retries: 3
+
 
   file-server-2:
     container_name: file-server-2

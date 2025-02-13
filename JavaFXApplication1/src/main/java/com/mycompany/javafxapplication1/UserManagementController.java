@@ -169,23 +169,35 @@ public void initialize() {
             showErrorAlert("Add User Failed", "Error creating user: " + e.getMessage());
         }
     }
+private void createRoleDialog(User user) {
+    // Create an alert dialog with the user role (fixed to "user")
+    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+    alert.setTitle("Change Role");
+    alert.setHeaderText("You cannot change the role of the user: " + user.getUser());
+    alert.setContentText("Role will remain as 'user'.");
+
+    alert.showAndWait();
+}
 
     @FXML
+
 private void handleUpdateRole() {
     if (adminMode.get()) {
         User selected = userTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            createRoleDialog(selected).showAndWait().ifPresent(newRole -> {
-                try {
-                    new DB().updateUserRole(selected.getUser(), newRole);
+            createRoleDialog(selected);
+        }else {
+            showErrorAlert("No User Selected", "Please select a user to update.");
+        }
+        try {
+                    new DB().updateUserRole(selected.getUser());
                     showSuccessAlert("Role Updated", "User role changed successfully!");
                     loadAppropriateUsers(); // Refresh the table
                 } catch (SQLException | ClassNotFoundException e) {
                     showErrorAlert("Update Failed", "Error updating role: " + e.getMessage());
                 }
-            });
-        }
-    } else {
+            }
+     else {
         showErrorAlert("Permission Denied", "Only admins can update user roles.");
     }
 }
@@ -269,5 +281,6 @@ private void handleDeleteUser() {
     public BooleanProperty adminModeProperty() {
     return adminMode;
 }
+
 
 }
