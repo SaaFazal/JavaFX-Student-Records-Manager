@@ -17,7 +17,7 @@ services:
     container_name: comp20081-files-container1
     image: pedrombmachado/simple-ssh-container:base
     ports:
-      - "4848:22"
+      - "4849:22"
     hostname: comp20081-files-container1
     networks:
       - comp20081_network
@@ -26,7 +26,7 @@ services:
     container_name: comp20081-files-container2
     image: pedrombmachado/simple-ssh-container:base
     ports:
-      - "4849:22"
+      - "4850:22"
     hostname: comp20081-files-container2
     networks:
       - comp20081_network
@@ -35,7 +35,7 @@ services:
     container_name: comp20081-files-container3
     image: pedrombmachado/simple-ssh-container:base
     ports:
-      - "4850:22"
+      - "4851:22"
     hostname: comp20081-files-container3
     networks:
       - comp20081_network
@@ -44,7 +44,7 @@ services:
     container_name: comp20081-files-container4
     image: pedrombmachado/simple-ssh-container:base
     ports:
-      - "4851:22"
+      - "4852:22"
     hostname: comp20081-files-container4
     networks:
       - comp20081_network
