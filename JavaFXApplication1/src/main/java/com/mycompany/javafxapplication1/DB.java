@@ -299,14 +299,14 @@ public void addUser(String username, String password, String role) throws SQLExc
 }
 
 public void updateUserRole(String username, String newRole) throws SQLException, ClassNotFoundException {
-    String sql = "UPDATE users SET role = ? WHERE name = ?";
-    try (Connection conn = getConnection();
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        pstmt.setString(1, newRole);
-        pstmt.setString(2, username);
-        pstmt.executeUpdate();
+    String query = "UPDATE users SET role = ? WHERE name = ?";
+    try (Connection conn = DB.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+        stmt.setString(1, newRole);
+        stmt.setString(2, username);
+        stmt.executeUpdate();
     }
 }
+
 
 public void deleteUser(String username) throws SQLException, ClassNotFoundException {
     String sql = "DELETE FROM users WHERE name = ?";

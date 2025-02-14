@@ -42,6 +42,11 @@
         <PasswordField fx:id="rePassPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" promptText="Re-enter password" style="-fx-background-color: #ecf0f1; -fx-font-size: 14px; -fx-padding: 5px;" />
 
         <!-- Admin Passcode -->
+        <!-- Admin Passcode Info -->
+<Label text="Default role: User. Enter passcode to become Admin." 
+       GridPane.columnIndex="1" GridPane.rowIndex="4" 
+       style="-fx-text-fill: #f39c12; -fx-font-size: 12px;" />
+
         <Label text="Admin Passcode (Optional)" GridPane.rowIndex="3" GridPane.halignment="RIGHT" style="-fx-text-fill: white;" />
         <PasswordField fx:id="adminPasscodeField" GridPane.columnIndex="1" GridPane.rowIndex="3" promptText="Enter admin passcode" style="-fx-background-color: #ecf0f1; -fx-font-size: 14px; -fx-padding: 5px;" />
     </GridPane>

@@ -169,38 +169,62 @@ public void initialize() {
             showErrorAlert("Add User Failed", "Error creating user: " + e.getMessage());
         }
     }
-private void createRoleDialog(User user) {
-    // Create an alert dialog with the user role (fixed to "user")
-    Alert alert = new Alert(Alert.AlertType.INFORMATION);
-    alert.setTitle("Change Role");
-    alert.setHeaderText("You cannot change the role of the user: " + user.getUser());
-    alert.setContentText("Role will remain as 'user'.");
+private Dialog<String> createRoleDialog(User user) {
+    Dialog<String> dialog = new Dialog<>();
+    dialog.setTitle("Change Role");
+    
+    // If the current user is an admin, let them choose the role
+    if (adminMode.get()) {
+        // Allow admin to choose a new role from a ComboBox
+        ComboBox<String> roleComboBox = new ComboBox<>(FXCollections.observableArrayList("user", "admin"));
+        roleComboBox.setValue(user.getRole());  // Set the current role as the default
 
-    alert.showAndWait();
+        dialog.getDialogPane().setContent(roleComboBox);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                return roleComboBox.getValue();  // Return the selected role
+            }
+            return null;
+        });
+    } else {
+        // If it's a regular user, display an alert saying roles can't be changed
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Role Change Restricted");
+        alert.setHeaderText("You cannot change the role for " + user.getUser());
+        alert.setContentText("Roles are fixed and cannot be changed for regular users.");
+        alert.showAndWait();
+    }
+    return dialog;
 }
 
-    @FXML
 
+    @FXML
 private void handleUpdateRole() {
+    // Only allow admins to update roles
     if (adminMode.get()) {
         User selected = userTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            createRoleDialog(selected);
-        }else {
-            showErrorAlert("No User Selected", "Please select a user to update.");
-        }
-        try {
-                    new DB().updateUserRole(selected.getUser());
+            // Admin can change roles; we allow them to choose a new role.
+            // For simplicity, let's say admins can choose between "user" and "admin" roles
+            createRoleDialog(selected).showAndWait().ifPresent(newRole -> {
+                try {
+                    new DB().updateUserRole(selected.getUser(), newRole);
                     showSuccessAlert("Role Updated", "User role changed successfully!");
-                    loadAppropriateUsers(); // Refresh the table
+                    loadAppropriateUsers(); // Refresh the table after the role change
                 } catch (SQLException | ClassNotFoundException e) {
                     showErrorAlert("Update Failed", "Error updating role: " + e.getMessage());
                 }
-            }
-     else {
+            });
+        } else {
+            showErrorAlert("No User Selected", "Please select a user to update.");
+        }
+    } else {
         showErrorAlert("Permission Denied", "Only admins can update user roles.");
     }
 }
+
 
     @FXML
 private void handleUpdatePassword() {

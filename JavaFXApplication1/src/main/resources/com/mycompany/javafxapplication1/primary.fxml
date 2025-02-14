@@ -5,46 +5,52 @@
 <?import javafx.geometry.*?>
 
 <VBox alignment="CENTER" spacing="20.0" prefWidth="1000.0" prefHeight="700.0" 
-      style="-fx-background-color: #34495e;"
+      style="-fx-background-color: #2c3e50;"
       xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.javafxapplication1.PrimaryController">
     
     <children>
-        <Label text="User Login" style="-fx-font-size: 20px; -fx-text-fill: white;"/>
+        <!-- Welcome Message -->
+        <Label text="Welcome to the System" style="-fx-font-size: 26px; -fx-text-fill: #f1c40f; -fx-font-weight: bold;"/>
+        <Label text="Please enter your credentials to log in" style="-fx-font-size: 16px; -fx-text-fill: white;"/>
+        <Label fx:id="welcomeMessage" text="" style="-fx-text-fill: white; -fx-font-size: 16px;" />
 
-        <GridPane alignment="CENTER">
+
+        <!-- Login Form -->
+        <GridPane alignment="CENTER" hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="150.0" />
+                <ColumnConstraints minWidth="150.0"/>
+                <ColumnConstraints minWidth="250.0"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="40.0"/>
+                <RowConstraints minHeight="40.0"/>
+                <RowConstraints minHeight="50.0"/>
             </rowConstraints>
 
             <children>
-                <Label text="User" style="-fx-text-fill: white;"/>
-                <TextField fx:id="userTextField" GridPane.columnIndex="1" style="-fx-background-color: #ecf0f1;" />
+                <Label text="Username:" style="-fx-font-size: 14px; -fx-text-fill: white;"/>
+                <TextField fx:id="userTextField" GridPane.columnIndex="1" style="-fx-background-color: #ecf0f1; -fx-font-size: 14px;" />
 
-                <Label text="Password" GridPane.rowIndex="1" style="-fx-text-fill: white;" />
+                <Label text="Password:" GridPane.rowIndex="1" style="-fx-font-size: 14px; -fx-text-fill: white;" />
                 <PasswordField fx:id="passPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="1" 
-                              style="-fx-background-color: #ecf0f1;" />
+                              style="-fx-background-color: #ecf0f1; -fx-font-size: 14px;" />
 
-                <Button fx:id="registerBtn" text="Register" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                        style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; 
-                               -fx-border-radius: 5px; -fx-padding: 5px;" 
-                        onAction="#registerBtnHandler"/>
+                <!-- Buttons Section -->
+                <HBox spacing="20" GridPane.columnSpan="2" GridPane.rowIndex="2" alignment="CENTER">
+                    <Button fx:id="registerBtn" text="Register" 
+                            style="-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10px;"
+                            onAction="#registerBtnHandler"/>
 
-                <Button fx:id="primaryButton" text="Login" GridPane.rowIndex="2" 
-                        style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-weight: bold; 
-                               -fx-border-radius: 5px; -fx-padding: 5px;" 
-                        onAction="#switchToSecondary"/>
+                    <Button fx:id="loginButton" text="Login" 
+                            style="-fx-background-color: #2980b9; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 10px;"
+                            onAction="#switchToSecondary"/>
+                </HBox>
             </children>
         </GridPane>
     </children>
 
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+        <Insets bottom="30.0" left="20.0" right="20.0" top="30.0" />
     </padding>
 </VBox>

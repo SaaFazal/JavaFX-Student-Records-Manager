@@ -40,18 +40,17 @@ services:
       - comp20081_network
 
   file-server-1:
-  container_name: file-server-1
-  image: pedrombmachado/simple-ssh-container:base
-  ports:
-    - "4849:22"
-  hostname: file-server-1
-  networks:
-    - comp20081_network
-  healthcheck:
-    test: ["CMD", "ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "root@localhost", "exit"]   #Health Check 
-    interval: 30s
-    retries: 3
-
+    container_name: file-server-1
+    image: pedrombmachado/simple-ssh-container:base
+    ports:
+      - "4849:22"
+    hostname: file-server-1
+    networks:
+      - comp20081_network
+    healthcheck:
+      test: ["CMD", "ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=5", "root@localhost", "exit"]   #Health Check 
+      interval: 30s
+      retries: 3
 
   file-server-2:
     container_name: file-server-2
@@ -86,3 +85,4 @@ networks:
 
 volumes:
   docker_comp20081:
+
