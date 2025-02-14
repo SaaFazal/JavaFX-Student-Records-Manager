@@ -71,7 +71,7 @@ public class RegisterController {
         }
     }
 
-    // Method to show confirmation or error dialog
+    
     private void showDialog(String headerMsg, String contentMsg, Alert.AlertType type) {
         Alert alert = new Alert(type);
         alert.setTitle("Confirmation Dialog");

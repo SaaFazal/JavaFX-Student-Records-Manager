@@ -31,7 +31,7 @@ public class TerminalController {
     private TextField commandInput;
 
     @FXML
-    private Button backButton; // Added back button
+    private Button backButton; 
 
     @FXML
 private void onEnterButtonClicked() {

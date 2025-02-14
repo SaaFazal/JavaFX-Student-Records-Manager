@@ -164,7 +164,7 @@ private void createFile(String filename) {
             editorStage.show();
             
             // Once the file is updated, trigger the load balancer to handle the upload
-            loadBalancer.handleFileUpload(file);  // Call load balancer here
+            loadBalancer.handleFileUpload(file); 
         } catch (IOException e) {
             showAlert("Error", "Failed to open editor: " + e.getMessage());
         }

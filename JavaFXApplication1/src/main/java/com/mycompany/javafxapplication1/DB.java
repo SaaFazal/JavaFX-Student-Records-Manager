@@ -284,7 +284,7 @@ public class DB {
     Class.forName("org.sqlite.JDBC");
     return DriverManager.getConnection(fileName);
 }
-    // Add these methods to your DB class
+  
 public void addUser(String username, String password, String role) throws SQLException {
     String sql = "INSERT INTO users (name, password, role) VALUES (?, ?, ?)";
     try (Connection conn = getConnection();
