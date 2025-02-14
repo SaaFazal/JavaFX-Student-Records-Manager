@@ -41,7 +41,7 @@ public class FileManagementController {
     private String userRole;
     private String currentUser; // Dynamically set
 
-    private static final String FILE_DIRECTORY = "/home/ntu-user/NetBeansProjects/cwk/JavaFXApplication1/"; 
+    private static final String FILE_DIRECTORY = "/home/ntu-user/NetBeansProjects/comp20081_cwk/JavaFXApplication1/"; 
     
     private LoadBalancer loadBalancer;  // Declare the LoadBalancer object
 

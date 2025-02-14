@@ -39,32 +39,36 @@ public class PrimaryController {
     }
 
     @FXML
-    private void switchToSecondary() {
-        Stage primaryStage = (Stage) loginButton.getScene().getWindow();
-        try {
-            DB myObj = new DB();
-            String username = userTextField.getText();
-            String password = passPasswordField.getText();
-            
-            if (myObj.validateUser(username, password)) {
-                String role = myObj.getUserRole(username);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(
-                    "/com/mycompany/javafxapplication1/mainDashboard.fxml"
-                ));
-                Parent root = loader.load();
-                
-                MainDashboardController controller = loader.getController();
-                controller.setUserRole(role);
-                controller.setCurrentUser(username);
-                
-                primaryStage.setScene(new Scene(root, 1200, 800));
-            } else {
-                showAlert("Login Failed", "Invalid credentials");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+private void switchToSecondary() {
+    Stage primaryStage = (Stage) loginButton.getScene().getWindow();
+    try {
+        DB myObj = new DB();
+        String username = userTextField.getText();
+        String password = passPasswordField.getText();
+        
+        if (myObj.validateUser(username, password)) {
+            String role = myObj.getUserRole(username);
+
+            // ✅ Set the current logged-in user in the User class
+            User.currentUser = new User(username, password, role);
+            System.out.println("✅ User logged in: " + User.currentUser.getUser() + " (Role: " + User.currentUser.getRole() + ")");
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/mainDashboard.fxml"));
+            Parent root = loader.load();
+
+            MainDashboardController controller = loader.getController();
+            controller.setUserRole(role);
+            controller.setCurrentUser(username); // ✅ Pass username explicitly
+
+            primaryStage.setScene(new Scene(root, 1200, 800));
+        } else {
+            showAlert("Login Failed", "Invalid credentials");
         }
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+
 
     private void switchScene(String fxmlPath, String title) {
         try {
@@ -88,3 +92,5 @@ public class PrimaryController {
         alert.showAndWait();
     }
 }
+
+

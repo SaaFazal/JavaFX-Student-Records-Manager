@@ -41,7 +41,11 @@ public void setCurrentUser(String user) {
 private void handleUserManagement(ActionEvent event) throws IOException {
     try {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/mycompany/javafxapplication1/userManagement.fxml"));
-        Parent root = loader.load();
+Parent root = loader.load();
+
+UserManagementController controller = loader.getController();
+controller.setCurrentUser(User.currentUser.getUser()); // ✅ Ensure full user data is passed
+
 
         Stage userManagementStage = new Stage();
         userManagementStage.setTitle("User Management");

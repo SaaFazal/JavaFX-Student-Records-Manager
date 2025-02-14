@@ -2,26 +2,45 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
 
 <VBox xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.mycompany.javafxapplication1.UserManagementController" 
-      spacing="10" style="-fx-padding: 20;">
+      spacing="15" style="-fx-padding: 30; -fx-background-color: #f4f4f4;">
 
-    <TableView fx:id="userTable" prefHeight="400" prefWidth="600">
+    <!-- Welcome Message -->
+    <Label text="Welcome to User Management" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #333;" />
+
+    <!-- User Table -->
+    <TableView fx:id="userTable" prefHeight="500" prefWidth="800"
+               style="-fx-border-color: #ccc; -fx-border-radius: 10; -fx-background-color: white;">
         <columns>
-            <TableColumn text="Username" fx:id="usernameColumn" />
-            <TableColumn text="Role" fx:id="roleColumn" />
-            <TableColumn text="Password" fx:id="passwordColumn"/>
-
+            <TableColumn text="Username" fx:id="usernameColumn" prefWidth="250"/>
+            <TableColumn text="Role" fx:id="roleColumn" prefWidth="200"/>
+            <TableColumn text="Password" fx:id="passwordColumn" visible="false" prefWidth="200"/> 
+            <!-- Hide password column for security -->
         </columns>
     </TableView>
 
-    <HBox spacing="10">
-    <Button fx:id="addUserBtn" text="Add User" onAction="#handleAddUser"/>
-    <Button fx:id="updateRoleBtn" text="Update Role" onAction="#handleUpdateRole"/>
-    <Button fx:id="deleteUserBtn" text="Delete User" onAction="#handleDeleteUser"/>
-    <Button fx:id="changePasswordBtn" text="Change Password" onAction="#handleUpdatePassword"/>
-    <Button fx:id="backBtn" text="Back" onAction="#handleBack"/>
-</HBox>
+    <!-- Buttons Section -->
+    <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10;" >
+        <Button fx:id="addUserBtn" text="➕Add User" onAction="#handleAddUser"
+                style="-fx-background-color: #28a745; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+<Button fx:id="updateRoleBtn" text="Update Role" onAction="#handleUpdateRole" 
+        style="-fx-background-color: #ffc107; -fx-text-fill: black; -fx-font-size: 14px; -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+<Button fx:id="deleteUserBtn" text="Delete User" onAction="#handleDeleteUser" 
+        style="-fx-background-color: #dc3545; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+<Button fx:id="updateNameBtn" text="Update Name" onAction="#handleUpdateName"
+style="-fx-background-color: #007bff; -fx-text-fill: white; -fx-font-size: 14px; 
+                   -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+        <Button fx:id="changePasswordBtn" text="Change Password" onAction="#handleUpdatePassword" 
+                style="-fx-background-color: #17a2b8; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+        <Button fx:id="backBtn" text="Back" onAction="#handleBack" 
+                style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px 15px; -fx-border-radius: 5;"/>
+    </HBox>
 
 </VBox>
+
+
+
+  

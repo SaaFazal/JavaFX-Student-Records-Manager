@@ -7,24 +7,36 @@
 
 <VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" 
       fx:controller="com.mycompany.javafxapplication1.FileManagementController" 
-      alignment="CENTER" spacing="20" style="-fx-background-color: #2c3e50;">
-    
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+      alignment="CENTER" spacing="20" style="-fx-background-color: #2c3e50; -fx-padding: 30px;">
 
+    <!-- Welcome Label -->
     <Label text="File Management" style="-fx-font-size: 24px; -fx-text-fill: white; -fx-font-weight: bold;" />
-    <ListView fx:id="fileListView" prefHeight="400" prefWidth="500"/>
-    
-    <HBox spacing="15" alignment="CENTER">
+
+    <!-- File List (Bigger for Better Visibility) -->
+    <ListView fx:id="fileListView" prefHeight="450" prefWidth="600"
+              style="-fx-border-color: #ecf0f1; -fx-border-radius: 10px; -fx-background-color: white;"/>
+
+    <!-- Buttons Section -->
+    <HBox spacing="20" alignment="CENTER">
         <Button fx:id="addFileBtn" text="Add File" onAction="#handleAddFile"
-                style="-fx-background-color: #2ecc71; -fx-text-fill: white;"/>
-        <Button fx:id="updateFileBtn" text="Update File" onAction="#handleUpdateFile"
-                style="-fx-background-color: #f39c12; -fx-text-fill: white;"/>
+                style="-fx-background-color: #2ecc71; -fx-text-fill: white; -fx-font-size: 14px; 
+                       -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+        
+        <Button fx:id="updateFileBtn" text="Edit File" onAction="#handleUpdateFile"
+                style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 14px; 
+                       -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+        
         <Button fx:id="deleteFileBtn" text="Delete File" onAction="#handleDeleteFile"
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white;"/>
-        <Button text="Open File" onAction="#handleOpenFile"/>
-        <Button text="Back" onAction="#handleBack" 
-                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10px 20px;" />
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; 
+                       -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+        
+        <Button fx:id="openFileBtn" text="Open File" onAction="#handleOpenFile"
+                style="-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-size: 14px; 
+                       -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+        
+        <Button fx:id="backBtn" text="Back" onAction="#handleBack"
+                style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; 
+                       -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
     </HBox>
+
 </VBox>

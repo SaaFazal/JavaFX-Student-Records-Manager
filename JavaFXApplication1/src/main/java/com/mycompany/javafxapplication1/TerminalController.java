@@ -64,17 +64,31 @@ private void backButtonHandler() {
 }
 
 private void handleNanoCommand(String command) {
-    String filename = command.substring(5).trim();
+    String filename = command.substring(5).trim(); // Extract filename
+
     try {
         File file = new File(filename);
-        if (!file.exists()) file.createNewFile();
-        
-        Process process = new ProcessBuilder("gnome-terminal", "--", "nano", filename).start();
-        process.waitFor();
+        if (!file.exists()) file.createNewFile(); // Ensure file exists
+
+        ProcessBuilder processBuilder;
+
+        if (System.getProperty("os.name").toLowerCase().contains("win")) {
+            // Windows: Open file in Notepad (since nano isn't available by default)
+            processBuilder = new ProcessBuilder("notepad.exe", filename);
+        } else if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+            // macOS: Open file in nano via Terminal
+            processBuilder = new ProcessBuilder("open", "-a", "Terminal", "nano", filename);
+        } else {
+            // Linux: Open in a new terminal window
+            processBuilder = new ProcessBuilder("x-terminal-emulator", "-e", "nano", filename);
+        }
+
+        processBuilder.start(); // Start the process
     } catch (Exception e) {
-        showError("Editor Error", "Failed to open nano editor");
+        showError("Editor Error", "Failed to open nano editor: " + e.getMessage());
     }
 }
+
 private Stage stage;
 
 public void setStage(Stage stage) {

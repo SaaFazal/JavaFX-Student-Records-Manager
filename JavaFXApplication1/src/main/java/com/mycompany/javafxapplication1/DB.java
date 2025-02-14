@@ -328,6 +328,15 @@ public void deleteUser(String username) throws SQLException, ClassNotFoundExcept
         throw new SQLException("Password update failed", e);
     }
 }
+    public void updateUserName(String oldName, String newName) throws SQLException, ClassNotFoundException {
+    try (Connection conn = getConnection();
+         PreparedStatement stmt = conn.prepareStatement("UPDATE users SET name = ? WHERE name = ?")) {
+
+        stmt.setString(1, newName);
+        stmt.setString(2, oldName);
+        stmt.executeUpdate();
+    }
+}
 }
 
 

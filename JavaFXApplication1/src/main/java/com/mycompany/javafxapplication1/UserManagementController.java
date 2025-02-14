@@ -30,6 +30,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.scene.control.Button;
 
 public class UserManagementController {
@@ -48,34 +51,56 @@ private String userRole;
 
 public void setUserRole(String role) {
         this.userRole = role;
-        loadAllUsers();
+        loadAppropriateUsers();
     }
 
 public void setCurrentUser(String user) {
+    if (user == null || user.isEmpty()) {
+        System.out.println("❌ No user provided to UserManagementController.");
+        return;
+    }
+
     this.currentUser = user;
-    loadAllUsers();  
+    this.userRole = User.currentUser.getRole(); // Get role from User class
+    System.out.println("✅ UserManagementController received user: " + this.currentUser + ", Role: " + this.userRole);
+
+    checkAdminStatus();
+    loadAppropriateUsers();
 }
+
+
+
 
 @FXML
 public void initialize() {
     System.out.println("UserManagementController initialized!");
     setupTableColumns();
     checkAdminStatus();
-    loadAppropriateUsers();
 
-    // Bind button visibility to adminMode
-    addUserBtn.visibleProperty().bind(adminMode);
-    updateRoleBtn.visibleProperty().bind(adminMode);
-    deleteUserBtn.visibleProperty().bind(adminMode);
-    changePasswordBtn.visibleProperty().bind(adminMode.not());
+    if (User.currentUser == null) {
+        System.out.println("No current user found!");
+    } else {
+        System.out.println("Current User: " + User.currentUser.getUser() + ", Role: " + User.currentUser.getRole());
+    } boolean isAdmin = User.currentUser != null && User.currentUser.isAdmin();
+    loadAppropriateUsers();
+    addUserBtn.setVisible(isAdmin);
+    updateRoleBtn.setVisible(isAdmin);
+    deleteUserBtn.setVisible(isAdmin);
+    changePasswordBtn.setVisible(true);
+
+    
 }
 
+
     private void setupTableColumns() {
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("user"));
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        passwordColumn.setCellValueFactory(new PropertyValueFactory<>("pass"));
-        passwordColumn.visibleProperty().bind(adminMode);
-    }
+    usernameColumn.setCellValueFactory(new PropertyValueFactory<>("user"));
+    roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
+    
+    // Hide passwords for security
+    passwordColumn.setCellValueFactory(cellData -> new SimpleStringProperty("******"));
+    passwordColumn.setVisible(false);
+}
+
 
     private void checkAdminStatus() {
     if (User.currentUser != null) {
@@ -90,18 +115,24 @@ public void initialize() {
 
     private void loadAppropriateUsers() {
     userList.clear();
-    System.out.println("Admin Mode Check: " + adminMode.get());
+    System.out.println("Admin Mode: " + adminMode.get());
 
     if (adminMode.get()) {
-        loadAllUsers(); // Admins see all users
+        loadAllUsers();  // Admins see all users
     } else {
-        loadCurrentUser(); // Regular users see only themselves
+        loadCurrentUser();  // Regular users see only themselves
     }
+
+    System.out.println("Final user list size: " + userList.size());
+    userTable.setItems(userList); // Ensure table updates
 }
 
 
 
+
     private void loadAllUsers() {
+    userList.clear(); // Clear old data
+
     try (Connection conn = DB.getConnection();
          PreparedStatement stmt = conn.prepareStatement("SELECT name, password, role FROM users");
          ResultSet rs = stmt.executeQuery()) {
@@ -110,18 +141,20 @@ public void initialize() {
             String name = rs.getString("name");
             String password = rs.getString("password");
             String role = rs.getString("role");
-            System.out.println("User found: " + name + ", Role: " + role); // Debug print
 
+            System.out.println("User found: " + name + ", Role: " + role); // Debugging
             userList.add(new User(name, password, role));
         }
 
-        System.out.println("Total users loaded: " + userList.size()); // Debug print
-        userTable.setItems(userList);
-        
+        System.out.println("Total users loaded: " + userList.size()); // Debugging
+        userTable.setItems(userList); // Update table data
+
     } catch (SQLException | ClassNotFoundException e) {
         showErrorAlert("Database Error", "Failed to load users: " + e.getMessage());
+        e.printStackTrace();
     }
 }
+
 
 
 
@@ -131,6 +164,46 @@ public void initialize() {
             userTable.setItems(userList);
         }
     }
+
+    @FXML
+private void handleUpdateName() {
+    User selectedUser = userTable.getSelectionModel().getSelectedItem();
+    
+    if (selectedUser == null) {
+        showErrorAlert("No User Selected", "Please select a user to update the name.");
+        return;
+    }
+
+    // Allow admins to change any user's name; normal users can change their own name
+    if (!User.currentUser.isAdmin() && !selectedUser.getUser().equals(User.currentUser.getUser())) {
+        showErrorAlert("Permission Denied", "You can only update your own username.");
+        return;
+    }
+
+    // Show input dialog to enter new name
+    TextInputDialog dialog = new TextInputDialog(selectedUser.getUser());
+    dialog.setTitle("Update Username");
+    dialog.setHeaderText("Enter a new username for " + selectedUser.getUser());
+    Optional<String> result = dialog.showAndWait();
+
+    result.ifPresent(newName -> {
+        if (newName.trim().isEmpty()) {
+            showErrorAlert("Invalid Name", "Username cannot be empty.");
+            return;
+        }
+
+        try {
+            new DB().updateUserName(selectedUser.getUser(), newName);  // Update database
+            selectedUser.setUser(newName);  // Update UI
+            showSuccessAlert("Username Updated", "Username successfully changed!");
+            loadAppropriateUsers();  // Refresh the user list
+        } catch (SQLException e) {
+            showErrorAlert("Update Failed", "Error updating username: " + e.getMessage());
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(UserManagementController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    });
+}
 
     @FXML
     private void handleAddUser() {
@@ -170,32 +243,20 @@ public void initialize() {
         }
     }
 private Dialog<String> createRoleDialog(User user) {
+    if (!adminMode.get()) {
+        showErrorAlert("Access Denied", "You cannot change roles.");
+        return null; // Prevent dialog from even opening
+    }
+
     Dialog<String> dialog = new Dialog<>();
     dialog.setTitle("Change Role");
-    
-    // If the current user is an admin, let them choose the role
-    if (adminMode.get()) {
-        // Allow admin to choose a new role from a ComboBox
-        ComboBox<String> roleComboBox = new ComboBox<>(FXCollections.observableArrayList("user", "admin"));
-        roleComboBox.setValue(user.getRole());  // Set the current role as the default
+    ComboBox<String> roleComboBox = new ComboBox<>(FXCollections.observableArrayList("user", "admin"));
+    roleComboBox.setValue(user.getRole());
 
-        dialog.getDialogPane().setContent(roleComboBox);
-        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+    dialog.getDialogPane().setContent(roleComboBox);
+    dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        dialog.setResultConverter(button -> {
-            if (button == ButtonType.OK) {
-                return roleComboBox.getValue();  // Return the selected role
-            }
-            return null;
-        });
-    } else {
-        // If it's a regular user, display an alert saying roles can't be changed
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Role Change Restricted");
-        alert.setHeaderText("You cannot change the role for " + user.getUser());
-        alert.setContentText("Roles are fixed and cannot be changed for regular users.");
-        alert.showAndWait();
-    }
+    dialog.setResultConverter(button -> button == ButtonType.OK ? roleComboBox.getValue() : null);
     return dialog;
 }
 
@@ -228,33 +289,29 @@ private void handleUpdateRole() {
 
     @FXML
 private void handleUpdatePassword() {
-    if (adminMode.get()) {
-        // Admin can update any user's password
-        User selected = userTable.getSelectionModel().getSelectedItem();
-        if (selected != null) {
-            createPasswordDialog(selected.getUser()).showAndWait().ifPresent(newPassword -> {
-                try {
-                    new DB().updateUserPassword(selected.getUser(), newPassword);
-                    showSuccessAlert("Password Updated", "Password changed successfully!");
-                    loadAppropriateUsers(); // Refresh the table
-                } catch (SQLException e) {
-                    showErrorAlert("Update Failed", "Error changing password: " + e.getMessage());
-                }
-            });
-        }
-    } else {
-        // Regular user can only update their own password
-        createPasswordDialog(User.currentUser.getUser()).showAndWait().ifPresent(newPassword -> {
-            try {
-                new DB().updateUserPassword(User.currentUser.getUser(), newPassword);
-                showSuccessAlert("Password Updated", "Password changed successfully!");
-                loadAppropriateUsers(); // Refresh the table
-            } catch (SQLException e) {
-                showErrorAlert("Update Failed", "Error changing password: " + e.getMessage());
-            }
-        });
+    User selected = userTable.getSelectionModel().getSelectedItem();
+    
+    if (selected == null) {
+        showErrorAlert("No User Selected", "Please select a user.");
+        return;
     }
+
+    // Admin can update anyone's password, users can only update their own
+    if (!adminMode.get() && !selected.getUser().equals(currentUser)) {
+        showErrorAlert("Permission Denied", "You can only change your own password.");
+        return;
+    }
+
+    createPasswordDialog(selected.getUser()).showAndWait().ifPresent(newPassword -> {
+        try {
+            new DB().updateUserPassword(selected.getUser(), newPassword);
+            showSuccessAlert("Password Updated", "Password changed successfully!");
+        } catch (SQLException e) {
+            showErrorAlert("Update Failed", "Error changing password: " + e.getMessage());
+        }
+    });
 }
+
 
 private TextInputDialog createPasswordDialog(String username) {
     TextInputDialog dialog = new TextInputDialog();
