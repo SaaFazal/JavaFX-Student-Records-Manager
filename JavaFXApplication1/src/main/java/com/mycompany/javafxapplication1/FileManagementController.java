@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import javafx.collections.FXCollections;
@@ -37,6 +38,9 @@ public class FileManagementController {
     
     @FXML
     private Button openFileBtn;
+    
+    @FXML
+    private Button uploadButton;
 
     private String userRole;
     private String currentUser; // Dynamically set
@@ -223,6 +227,26 @@ private void openFileInEditor(String filename) {
         editorStage.show();
     } catch (IOException e) {
         showAlert("Error", "Failed to open file: " + e.getMessage());
+    }
+}
+@FXML
+private void handleUploadFile() {
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Select File to Upload");
+
+    // Allow any file type
+    File selectedFile = fileChooser.showOpenDialog(uploadButton.getScene().getWindow());
+
+    if (selectedFile != null) {
+        try {
+            
+            Path destination = Path.of("uploads/" + selectedFile.getName());
+            Files.copy(selectedFile.toPath(), destination, StandardCopyOption.REPLACE_EXISTING);
+            
+            System.out.println("File uploaded: " + selectedFile.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

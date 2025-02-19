@@ -25,6 +25,8 @@
         <Button fx:id="updateFileBtn" text="Edit File" onAction="#handleUpdateFile"
                 style="-fx-background-color: #f39c12; -fx-text-fill: white; -fx-font-size: 14px; 
                        -fx-padding: 10px 20px; -fx-border-radius: 5px;"/>
+        <Button fx:id="uploadButton" text="Upload File" onAction="#handleUploadFile" />
+
         
         <Button fx:id="deleteFileBtn" text="Delete File" onAction="#handleDeleteFile"
                 style="-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-font-size: 14px; 
